@@ -20,28 +20,24 @@ class WaliKelasActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wali_kelas)
 
-        // --- INI ADALAH BAGIAN BARU ---
-        // Inisialisasi Launcher.
-        // Kode di dalam { ... } ini akan dieksekusi saat DetailWaliActivity ditutup
+
         detailWaliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            // Cek apakah hasilnya "OK" (berarti tombol "Kirim Pesan" diklik)
+
             if (result.resultCode == Activity.RESULT_OK) {
-                // Ambil data nama wali dari hasil
+
                 val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
 
-                // Buat Intent HASIL BARU untuk dikirim balik ke TerlambatActivity
+
                 val resultIntent = Intent()
                 resultIntent.putExtra("NAMA_WALI_TERPILIH", namaWali)
 
                 // Kirim hasilnya...
                 setResult(Activity.RESULT_OK, resultIntent)
-
-                // ...dan tutup halaman daftar wali ini
                 finish()
             }
-            // Jika hasilnya BUKAN OK (misal, user tekan back), kita tidak lakukan apa-apa
+
         }
-        // --- Akhir bagian baru ---
+
 
         // Temukan tombol back
         val backButton = findViewById<ImageView>(R.id.iv_back_arrow)
@@ -50,27 +46,26 @@ class WaliKelasActivity : AppCompatActivity() {
         }
 
         // Temukan semua card guru
-        val cardBambang = findViewById<MaterialCardView>(R.id.card_bambang)
-        val cardKomarudin = findViewById<MaterialCardView>(R.id.card_komarudin)
-        val cardNeneng = findViewById<MaterialCardView>(R.id.card_neneng)
-        val cardAmelia = findViewById<MaterialCardView>(R.id.card_amelia)
+        val cardAgung = findViewById<ImageView>(R.id.card_Agung)
+        val cardEko = findViewById<ImageView>(R.id.card_Eko)
+        val cardAdi = findViewById<ImageView>(R.id.card_Adi)
+        val cardJaya = findViewById<ImageView>(R.id.card_Jaya)
 
         // Beri listener (SEMUA MEMANGGIL FUNGSI 'pindahKeDetail')
-        cardBambang.setOnClickListener {
-            pindahKeDetail("Bambang Sugi", "Asmaradun", R.drawable.kennan, "#F5F5F5")
+        cardAgung.setOnClickListener {
+            pindahKeDetail("Agung", "Kremes", R.drawable.kennan, "#F5F5F5")
         }
-        cardKomarudin.setOnClickListener {
-            pindahKeDetail("Komarudin", "Wijaya", R.drawable.oranglaki, "#FFCA28")
+        cardEko.setOnClickListener {
+            pindahKeDetail("Eko", "Lontong", R.drawable.andika, "#FFCA28")
         }
-        cardNeneng.setOnClickListener {
-            pindahKeDetail("Neneng", "Kumala", R.drawable.kennan, "#E53935")
+        cardAdi.setOnClickListener {
+            pindahKeDetail("Adi", "Gemblong", R.drawable.moses, "#E53935")
         }
-        cardAmelia.setOnClickListener {
-            pindahKeDetail("Amelia", "Rianty", R.drawable.oranglaki, "#1E88E5")
+        cardJaya.setOnClickListener {
+            pindahKeDetail("Jaya", "Gehu", R.drawable.rasya, "#1E88E5")
         }
     }
 
-    // --- REVISI FUNGSI INI ---
     private fun pindahKeDetail(namaDepan: String, namaBelakang: String, fotoResId: Int, warnaBg: String) {
         val intent = Intent(this, DetailWaliActivity::class.java)
         intent.putExtra("NAMA_DEPAN", namaDepan)

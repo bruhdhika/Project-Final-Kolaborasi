@@ -41,7 +41,6 @@ class DetailWaliActivity : AppCompatActivity() {
             finish()
         }
 
-        // --- REVISI UTAMA DI SINI ---
         // 5. Aktifkan tombol "Kirim Pesan"
         btnKirimPesan.setOnClickListener {
             // Buat Intent untuk "hasil"
