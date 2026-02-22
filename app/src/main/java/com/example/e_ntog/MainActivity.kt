@@ -3,6 +3,7 @@ package com.example.e_ntog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,34 +18,30 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_signin)
 
         databaseHelper = DatabaseHelper(this)
 
         val etEmail = findViewById<EditText>(R.id.et_email)
-        // val etPassword = findViewById<EditText>(R.id.et_password) // Password tidak dipakai
-
         val tombolMasuk = findViewById<AppCompatButton>(R.id.btn_masuk)
+        val tvLupaPassword = findViewById<TextView>(R.id.tv_lupa_password)
+
+        tvLupaPassword.setOnClickListener {
+            startActivity(Intent(this, NamaEmailActivity::class.java))
+        }
 
         tombolMasuk.setOnClickListener {
             val email = etEmail.text.toString().trim()
-
-            // Validasi: Hanya cek Email saja
             if (email.isEmpty()) {
                 Toast.makeText(this, "Mohon isi email Anda", Toast.LENGTH_SHORT).show()
             } else {
-                // Panggil fungsi "Simpan atau Cek"
                 val prosesBerhasil = databaseHelper.simpanAtauCekUser(email)
-
                 if (prosesBerhasil) {
                     Toast.makeText(this, "Selamat Datang!", Toast.LENGTH_SHORT).show()
-
-                    // Pindah ke Home
-                    val intent = Intent(this@MainActivity, HomeActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, HomeActivity::class.java))
                     finish()
                 } else {
-                    Toast.makeText(this, "Terjadi kesalahan database", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Kesalahan database", Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
     <application
@@ -15,20 +16,33 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Entog">
-
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditDataActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NamaEmailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OtpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LupaPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SignUpActivity"
+            android:exported="false" />
         <activity
             android:name=".StrukActivity"
             android:exported="false" />
-        <activity
-            android:name=".StrukDispensasi" />
-
-        <activity
-            android:name=".TidakHadirActivity" />
-
-        <activity
-            android:name=".StrukTidakHadir" />
-
-
+        <activity android:name=".StrukDispensasi" />
+        <activity android:name=".TidakHadirActivity" />
+        <activity android:name=".StrukTidakHadir" />
         <activity
             android:name=".DetailWaliActivity"
             android:exported="false" />
@@ -38,24 +52,24 @@
         <activity
             android:name=".TerlambatActivity"
             android:exported="false" />
-
         <activity
             android:name=".DispensasiActivity"
             android:exported="false" />
-
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
