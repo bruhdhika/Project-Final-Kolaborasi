@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "162466071119",
+    "project_id": "e-ntog",
+    "storage_bucket": "e-ntog.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162466071119:android:91da17e9cb6821514fa03a",
+        "android_client_info": {
+          "package_name": "com.example.e_ntog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1wH6H4N-0s-e0Ky6Wx9I_QWJXeXg-snU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
