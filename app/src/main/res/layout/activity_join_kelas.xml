@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FDE8E8">
+
+    <!-- Header background (sama seperti OTP) -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ellipse_227" />
+
+    <!-- Card Logo -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="160dp"
+        app:cardCornerRadius="40dp"
+        app:cardElevation="8dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            android:src="@drawable/image_3__1_"
+            android:scaleType="fitCenter" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Konten utama -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="350dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp">
+
+        <TextView
+            android:id="@+id/tv_sambutan_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Masukkan Kode Kelas:"
+            android:fontFamily="@font/ibm_plex_sans_jp_bold"
+            android:textSize="16sp"
+            android:textColor="#333333"
+            android:gravity="center"
+            android:layout_marginBottom="20dp" />
+
+        <!-- 6 Kotak Kode -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <EditText android:id="@+id/et_kode_1" android:layout_width="45dp" android:layout_height="55dp"
+                android:background="@drawable/bg_otp_box" android:gravity="center" android:layout_margin="4dp"
+                android:inputType="textCapCharacters" android:maxLength="1" android:textSize="20sp"
+                android:fontFamily="@font/ibm_plex_sans_jp_bold" />
+
+            <EditText android:id="@+id/et_kode_2" android:layout_width="45dp" android:layout_height="55dp"
+                android:background="@drawable/bg_otp_box" android:gravity="center" android:layout_margin="4dp"
+                android:inputType="textCapCharacters" android:maxLength="1" android:textSize="20sp"
+                android:fontFamily="@font/ibm_plex_sans_jp_bold" />
+
+            <EditText android:id="@+id/et_kode_3" android:layout_width="45dp" android:layout_height="55dp"
+                android:background="@drawable/bg_otp_box" android:gravity="center" android:layout_margin="4dp"
+                android:inputType="textCapCharacters" android:maxLength="1" android:textSize="20sp"
+                android:fontFamily="@font/ibm_plex_sans_jp_bold" />
+
+            <EditText android:id="@+id/et_kode_4" android:layout_width="45dp" android:layout_height="55dp"
+                android:background="@drawable/bg_otp_box" android:gravity="center" android:layout_margin="4dp"
+                android:inputType="textCapCharacters" android:maxLength="1" android:textSize="20sp"
+                android:fontFamily="@font/ibm_plex_sans_jp_bold" />
+
+            <EditText android:id="@+id/et_kode_5" android:layout_width="45dp" android:layout_height="55dp"
+                android:background="@drawable/bg_otp_box" android:gravity="center" android:layout_margin="4dp"
+                android:inputType="textCapCharacters" android:maxLength="1" android:textSize="20sp"
+                android:fontFamily="@font/ibm_plex_sans_jp_bold" />
+
+            <EditText android:id="@+id/et_kode_6" android:layout_width="45dp" android:layout_height="55dp"
+                android:background="@drawable/bg_otp_box" android:gravity="center" android:layout_margin="4dp"
+                android:inputType="textCapCharacters" android:maxLength="1" android:textSize="20sp"
+                android:fontFamily="@font/ibm_plex_sans_jp_bold" />
+        </LinearLayout>
+
+        <!-- ProgressBar -->
+        <ProgressBar
+            android:id="@+id/progress_bar_join"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Tombol Join -->
+        <Button
+            android:id="@+id/btn_join_kelas"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Masuk Kelas"
+            android:textAllCaps="false"
+            android:fontFamily="@font/ibm_plex_sans_jp_bold"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_blue_gradient"
+            app:backgroundTint="@null"
+            android:layout_marginHorizontal="20dp" />
+
+    </LinearLayout>
+    <include layout="@layout/layout_arrow" />
+</RelativeLayout>

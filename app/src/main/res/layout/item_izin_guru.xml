@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/bg_white_card_soft"
+    android:layout_marginBottom="8dp">
+
+    <TextView android:id="@+id/tv_izin_tanggal"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="01 Januari 2025" android:textSize="12sp" android:textColor="#757575" />
+
+    <TextView android:id="@+id/tv_izin_alasan"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Alasan izin..." android:textSize="14sp" android:textColor="#212121"
+        android:layout_marginTop="4dp" android:layout_marginBottom="8dp" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical">
+
+        <TextView android:id="@+id/tv_izin_status"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="⏳ Menunggu"
+            android:textSize="13sp" android:textStyle="bold" />
+
+        <Button android:id="@+id/btn_setujui"
+            android:layout_width="wrap_content" android:layout_height="36dp"
+            android:text="Setujui" android:textSize="12sp" android:textColor="#FFFFFF"
+            android:background="@drawable/bg_button_green"
+            android:layout_marginEnd="8dp" android:paddingHorizontal="12dp" />
+
+        <Button android:id="@+id/btn_tolak"
+            android:layout_width="wrap_content" android:layout_height="36dp"
+            android:text="Tolak" android:textSize="12sp" android:textColor="#FFFFFF"
+            android:background="@drawable/bg_button_red"
+            android:paddingHorizontal="12dp" />
+    </LinearLayout>
+    <include layout="@layout/layout_arrow" />
+</LinearLayout>

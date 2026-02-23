@@ -23,7 +23,7 @@ import androidx.core.content.ContextCompat // <-- IMPORT
 import com.google.android.material.card.MaterialCardView // <-- IMPORT
 import java.io.OutputStream
 
-class StrukDispensasi : AppCompatActivity() {
+class StrukDispensasi : BaseActivity() {
 
     // Launcher izin
     private val requestPermissionLauncher =
@@ -40,7 +40,7 @@ class StrukDispensasi : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_struk_dispensasi)
-
+setupBackButton()
         // Ambil data dari Intent
         val nama = intent.getStringExtra("NAMA") ?: "Tidak Ada Data"
         val kelas = intent.getStringExtra("KELAS") ?: "Tidak Ada Data"

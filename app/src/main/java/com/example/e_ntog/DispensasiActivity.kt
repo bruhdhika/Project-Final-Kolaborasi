@@ -3,99 +3,104 @@ package com.example.e_ntog
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
-import android.widget.ImageView
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
 
-class DispensasiActivity : AppCompatActivity() {
+class DispensasiActivity : BaseActivity() {
 
-    private lateinit var waliKelasResultLauncher: ActivityResultLauncher<Intent>
+    private val db = FirebaseFirestore.getInstance()
+    private lateinit var session: SessionManager
+    private lateinit var waliLauncher: ActivityResultLauncher<Intent>
 
-    // Form
     private lateinit var etNama: EditText
     private lateinit var spinnerKelas: Spinner
     private lateinit var etAlasan: EditText
     private lateinit var etWaliKelas: EditText
     private lateinit var clSearchWali: ConstraintLayout
-    private lateinit var ivSearchWali: ImageView
     private lateinit var btnSubmit: AppCompatButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dispensasi)
 
-        // Inisialisasi komponen
-        etNama = findViewById(R.id.et_nama)
-        spinnerKelas = findViewById(R.id.spinner_kelas)
-        etAlasan = findViewById(R.id.et_alasan)
+        setupBackButton()
+
+        session = SessionManager(this)
+
+        etNama      = findViewById(R.id.et_nama)
+        spinnerKelas= findViewById(R.id.spinner_kelas)
+        etAlasan    = findViewById(R.id.et_alasan)
         etWaliKelas = findViewById(R.id.et_wali_kelas)
-        clSearchWali = findViewById(R.id.cl_search_wali)
-        ivSearchWali = findViewById(R.id.iv_search_icon)   // <-- DITAMBAHKAN
-        btnSubmit = findViewById(R.id.btn_submit)
+        clSearchWali= findViewById(R.id.cl_search_wali)
+        btnSubmit   = findViewById(R.id.btn_submit)
 
-        // Launcher terima hasil
-        waliKelasResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        etNama.setText(session.getNama())
 
-                if (result.resultCode == Activity.RESULT_OK) {
-
-                    val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
-
-                    etWaliKelas.setText(namaWali)
-
-                    clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
-
-                    etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(
-                        0, 0, R.drawable.ic_check_circle, 0
-                    )
-                    etWaliKelas.setPadding(16, 0, 16, 0)
-                }
+        waliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
+                etWaliKelas.setText(namaWali)
+                clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
+                etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
+                etWaliKelas.setPadding(16, 0, 16, 0)
             }
-
-        // Masuk Ke Wali Kelas
-        val openWali = {
-            val intent = Intent(this, WaliKelasActivity::class.java)
-            waliKelasResultLauncher.launch(intent)
         }
 
+        val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
         clSearchWali.setOnClickListener { openWali() }
-        ivSearchWali.setOnClickListener { openWali() }   // <-- FIX: klik ikon search sekarang bisa
-        // ---------------------------------
+        findViewById<ImageView>(R.id.iv_search_icon).setOnClickListener { openWali() }
 
-        // Tombol submit
         btnSubmit.setOnClickListener {
+            val nama   = etNama.text.toString().trim()
+            val kelas  = spinnerKelas.selectedItem.toString()
+            val alasan = etAlasan.text.toString().trim()
+            val wali   = etWaliKelas.text.toString().trim()
 
-            val nama = etNama.text.toString()
-            val kelas = spinnerKelas.selectedItem.toString()
-            val alasan = etAlasan.text.toString()
-            val waliKelas = etWaliKelas.text.toString()
+            if (nama.isEmpty())   { etNama.error = "Nama wajib diisi"; return@setOnClickListener }
+            if (kelas == "Pilih Kelas...") {
+                Toast.makeText(this, "Pilih kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (alasan.isEmpty()) { etAlasan.error = "Alasan wajib diisi"; return@setOnClickListener }
+            if (wali.isEmpty())   {
+                Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            val intent = Intent(this, StrukDispensasi::class.java)
+            btnSubmit.isEnabled = false
+            val uid     = session.getUid()
+            val tanggal = SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(Date())
 
-            intent.putExtra("NAMA", nama)
-            intent.putExtra("KELAS", kelas)
-            intent.putExtra("ALASAN", alasan)
-            intent.putExtra("WALI_KELAS", waliKelas)
+            val historyData = hashMapOf(
+                "nama" to nama, "kelas" to kelas, "alasan" to alasan,
+                "waliKelas" to wali, "tanggal" to tanggal, "timestamp" to Timestamp.now(), "status" to "pending"
+            )
 
-            startActivity(intent)
-
-            //Simpan data dispen
-            val prefs = getSharedPreferences("DATA_IZIN", MODE_PRIVATE)
-            val editor = prefs.edit()
-
-            val jumlahDispen = prefs.getInt("JUMLAH_IZIN_DISPENSASI", 0) + 1
-            editor.putInt("JUMLAH_IZIN_DISPENSASI", jumlahDispen)
-
-            editor.apply()
-
-            //Balik ke Home
-            finish()
-
+            db.collection("users").document(uid)
+                .collection("history_dispen").add(historyData)
+                .addOnSuccessListener {
+                    db.collection("users").document(uid)
+                        .update("totalDispen", FieldValue.increment(1))
+                    btnSubmit.isEnabled = true
+                    startActivity(Intent(this, StrukDispensasi::class.java).apply {
+                        putExtra("NAMA", nama); putExtra("KELAS", kelas)
+                        putExtra("ALASAN", alasan); putExtra("WALI_KELAS", wali)
+                    })
+                    finish()
+                }
+                .addOnFailureListener {
+                    btnSubmit.isEnabled = true
+                    Toast.makeText(this, "Gagal: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 }

@@ -204,4 +204,6 @@
             android:textSize="18sp"
             android:layout_marginTop="32dp"/>
 
-        </LinearLayout> </ScrollView> </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout> </ScrollView>
+    <include layout="@layout/layout_arrow" />
+</androidx.constraintlayout.widget.ConstraintLayout>

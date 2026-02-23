@@ -3,20 +3,23 @@ package com.example.e_ntog
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast // Penting untuk Toast
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
 
-class TerlambatActivity : AppCompatActivity() {
+class TerlambatActivity : BaseActivity() {
 
-    // 1. Deklarasi Variabel Global di dalam Class
-    private lateinit var waliKelasResultLauncher: ActivityResultLauncher<Intent>
-    private lateinit var databaseHelper: DatabaseHelper
+    private val db = FirebaseFirestore.getInstance()
+    private lateinit var session: SessionManager
+    private lateinit var waliLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var etNama: EditText
     private lateinit var spinnerKelas: Spinner
@@ -28,77 +31,91 @@ class TerlambatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_terlambat)
+setupBackButton()
+        session = SessionManager(this)
 
-        // 2. Inisialisasi Database
-        databaseHelper = DatabaseHelper(this)
-
-        // 3. Inisialisasi Views (Cukup sekali di sini)
-        etNama = findViewById(R.id.et_nama)
-        spinnerKelas = findViewById(R.id.spinner_kelas)
-        etAlasan = findViewById(R.id.et_alasan)
+        etNama      = findViewById(R.id.et_nama)
+        spinnerKelas= findViewById(R.id.spinner_kelas)
+        etAlasan    = findViewById(R.id.et_alasan)
         etWaliKelas = findViewById(R.id.et_wali_kelas)
-        clSearchWali = findViewById(R.id.cl_search_wali)
-        btnSubmit = findViewById(R.id.btn_submit)
+        clSearchWali= findViewById(R.id.cl_search_wali)
+        btnSubmit   = findViewById(R.id.btn_submit)
 
-        // 4. Setup Result Launcher (Untuk menerima data dari WaliKelasActivity)
-        waliKelasResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        // Isi nama otomatis dari session
+        etNama.setText(session.getNama())
+
+        waliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
-
-                // Update UI jika wali dipilih
                 etWaliKelas.setText(namaWali)
-                clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green) // Pastikan drawable ini ada, atau ganti warna
-
-                // Opsional: Menambah ikon centang (pastikan ic_check_circle ada di drawable)
-                // etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
+                clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
+                etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
+                etWaliKelas.setPadding(16, 0, 16, 0)
             }
         }
 
-        // 5. Listener Tombol Cari Wali Kelas
-        clSearchWali.setOnClickListener {
-            val intent = Intent(this, WaliKelasActivity::class.java)
-            waliKelasResultLauncher.launch(intent)
-        }
+        val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
+        clSearchWali.setOnClickListener { openWali() }
+        findViewById<ImageView>(R.id.iv_search_icon).setOnClickListener { openWali() }
 
-        // 6. Listener Tombol Submit (Logika Gabungan)
         btnSubmit.setOnClickListener {
-            // A. Ambil Data dari Input
-            val nama = etNama.text.toString().trim()
-            val kelas = spinnerKelas.selectedItem.toString()
+            val nama   = etNama.text.toString().trim()
+            val kelas  = spinnerKelas.selectedItem.toString()
             val alasan = etAlasan.text.toString().trim()
-            val wali = etWaliKelas.text.toString().trim()
+            val wali   = etWaliKelas.text.toString().trim()
 
-            // B. Validasi Input Kosong
-            if (nama.isEmpty() || alasan.isEmpty() || wali.isEmpty()) {
-                Toast.makeText(this, "Mohon lengkapi semua data", Toast.LENGTH_SHORT).show()
-            } else {
-                // C. Simpan ke Database SQLite
-                val isSavedToDB = databaseHelper.insertTerlambat(nama, kelas, alasan, wali)
-
-                if (isSavedToDB) {
-                    // D. Jika Database Berhasil -> Simpan Shared Preferences (Counter)
-                    val prefs = getSharedPreferences("DATA_IZIN", MODE_PRIVATE)
-                    val editor = prefs.edit()
-                    val jumlahTerlambat = prefs.getInt("JUMLAH_IZIN_TERLAMBAT", 0) + 1
-                    editor.putInt("JUMLAH_IZIN_TERLAMBAT", jumlahTerlambat)
-                    editor.apply()
-
-                    Toast.makeText(this, "Data Berhasil Disimpan!", Toast.LENGTH_SHORT).show()
-
-                    // E. Pindah ke StrukActivity
-                    val intent = Intent(this, StrukActivity::class.java)
-                    intent.putExtra("NAMA", nama)
-                    intent.putExtra("KELAS", kelas)
-                    intent.putExtra("ALASAN", alasan)
-                    intent.putExtra("WALI_KELAS", wali)
-                    startActivity(intent)
-
-                    // F. Tutup Activity ini agar tidak bisa back
-                    finish()
-                } else {
-                    Toast.makeText(this, "Gagal menyimpan ke database", Toast.LENGTH_SHORT).show()
-                }
+            // Validasi
+            if (nama.isEmpty())   { etNama.error = "Nama wajib diisi";   return@setOnClickListener }
+            if (kelas == "Pilih Kelas...") {
+                Toast.makeText(this, "Pilih kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+            if (alasan.isEmpty()) { etAlasan.error = "Alasan wajib diisi"; return@setOnClickListener }
+            if (wali.isEmpty())   {
+                Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            btnSubmit.isEnabled = false
+
+            val uid       = session.getUid()
+            val now       = Timestamp.now()
+            val tanggal   = SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(Date())
+
+            // Simpan history ke sub-collection
+            val historyData = hashMapOf(
+                "nama"       to nama,
+                "kelas"      to kelas,
+                "alasan"     to alasan,
+                "waliKelas"  to wali,
+                "tanggal"    to tanggal,
+                "timestamp"  to now,
+                "status"     to "pending"
+            )
+
+            db.collection("users").document(uid)
+                .collection("history_terlambat")
+                .add(historyData)
+                .addOnSuccessListener {
+                    // Update counter di dokumen utama (increment atomik)
+                    db.collection("users").document(uid)
+                        .update("totalTerlambat", FieldValue.increment(1))
+
+                    btnSubmit.isEnabled = true
+                    // Kirim ke StrukActivity
+                    startActivity(Intent(this, StrukActivity::class.java).apply {
+                        putExtra("NAMA", nama)
+                        putExtra("KELAS", kelas)
+                        putExtra("ALASAN", alasan)
+                        putExtra("WALI_KELAS", wali)
+                        putExtra("TANGGAL", tanggal)
+                    })
+                    finish()
+                }
+                .addOnFailureListener {
+                    btnSubmit.isEnabled = true
+                    Toast.makeText(this, "Gagal simpan: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 }

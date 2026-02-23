@@ -23,7 +23,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.card.MaterialCardView
 import java.io.OutputStream
 
-class StrukTidakHadir : AppCompatActivity() {
+class StrukTidakHadir : BaseActivity() {
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
@@ -39,7 +39,7 @@ class StrukTidakHadir : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_struk_tidak_hadir)
-
+setupBackButton()
         // Ambil data
         val nama = intent.getStringExtra("NAMA") ?: "Tidak Ada Data"
         val kelas = intent.getStringExtra("KELAS") ?: "Tidak Ada Data"

@@ -8,9 +8,8 @@ import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher // <-- IMPORT INI
 import androidx.activity.result.contract.ActivityResultContracts // <-- IMPORT INI
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.card.MaterialCardView
 
-class WaliKelasActivity : AppCompatActivity() {
+class WaliKelasActivity : BaseActivity() {
 
     // Definisikan 'Launcher' untuk menerima hasil
     private lateinit var detailWaliLauncher: ActivityResultLauncher<Intent>
@@ -20,7 +19,7 @@ class WaliKelasActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wali_kelas)
 
-
+setupBackButton()
         detailWaliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
             if (result.resultCode == Activity.RESULT_OK) {

@@ -59,6 +59,13 @@
             android:layout_marginTop="10dp"
             android:paddingHorizontal="15dp" />
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp" />
 
         <Button
             android:id="@+id/btn_kirim_otp"
@@ -75,5 +82,5 @@
             app:backgroundTint="@null" />
     </LinearLayout>
 
-
+    <include layout="@layout/layout_arrow" />
 </RelativeLayout>

@@ -4,17 +4,18 @@ import android.app.Activity // <-- IMPORT INI
 import android.content.Intent // <-- IMPORT INI
 import android.graphics.Color
 import android.os.Bundle
-import android.widget.Button // <-- IMPORT INI
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton // <-- IMPORT INI
 import androidx.constraintlayout.widget.ConstraintLayout
 
-class DetailWaliActivity : AppCompatActivity() {
+class DetailWaliActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_wali)
+
+        setupBackButton()
 
         // 1. Ambil data yang dikirim dari Intent
         val namaDepan = intent.getStringExtra("NAMA_DEPAN")
