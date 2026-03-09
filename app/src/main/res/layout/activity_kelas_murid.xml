@@ -46,7 +46,6 @@
         android:id="@+id/tv_kode_kelas_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Kode Kelas: A3F7K2"
         android:textColor="#CCE3F2FD"
         android:textSize="14sp"
         android:layout_marginTop="4dp"
