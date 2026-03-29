@@ -18,21 +18,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Entog">
         <activity
+            android:name=".WaliKelasAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".activity_home_guru"
+            android:exported="false" />
+        <activity
             android:name=".BaseActivity"
             android:exported="false" />
-
         <activity
             android:name=".JoinKelasActivity"
             android:exported="false" />
-
         <activity
             android:name=".KelasMuridActivity"
             android:exported="false" />
         <activity
             android:name=".HomeGuruActivity"
             android:exported="false" />
-
-
         <activity
             android:name=".LoginActivity"
             android:exported="true">

@@ -29,20 +29,20 @@ class ProfileActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
-setupBackButton()
+        setupBackButton()
         session = SessionManager(this)
 
-        tvNama             = findViewById(R.id.namapengguna)
-        val tvKelas        = findViewById<TextView>(R.id.kelasdefault)
-        val imgAvatar      = findViewById<ImageView>(R.id.img_avatar)
-        val btnBack        = findViewById<ImageButton>(R.id.btn_back)
-        val btnEdit        = findViewById<ImageButton>(R.id.btn_edit)
-        val btnLogout      = findViewById<android.view.View>(R.id.btn_logout)
-        val btnDelete      = findViewById<android.view.View>(R.id.btn_delete)
+        tvNama = findViewById(R.id.namapengguna)
+        val tvKelas = findViewById<TextView>(R.id.kelasdefault)
+        val imgAvatar = findViewById<ImageView>(R.id.img_avatar)
+        val btnBack = findViewById<ImageButton>(R.id.btn_back)
+        val btnEdit = findViewById<ImageButton>(R.id.btn_edit)
+        val btnLogout = findViewById<android.view.View>(R.id.btn_logout)
+        val btnDelete = findViewById<android.view.View>(R.id.btn_delete)
         val btnKeluarKelas = findViewById<android.view.View>(R.id.btn_keluar_kelas)
-        val txtTidakMasuk  = findStatTextView(0)
-        val txtDispen      = findStatTextView(1)
-        val txtTerlambat   = findStatTextView(2)
+        val txtTidakMasuk = findStatTextView(0)
+        val txtDispen = findStatTextView(1)
+        val txtTerlambat = findStatTextView(2)
 
         btnBack.setOnClickListener { finish() }
 
@@ -50,12 +50,21 @@ setupBackButton()
             editLauncher.launch(Intent(this, EditDataActivity::class.java))
         }
 
+
         btnLogout.setOnClickListener {
-            auth.signOut()
-            session.clearSession()
-            startActivity(Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            })
+
+            val btnKeluarKelas = findViewById<android.view.View>(R.id.btn_keluar_kelas)
+
+            if (session.getRole() == SessionManager.ROLE_MURID) {
+                db.collection("users").document(session.getUid()).get()
+                    .addOnSuccessListener { snap ->
+                        val kelasId = snap.getString("kelasId") ?: ""
+                        if (kelasId.isNotEmpty()) {
+                            btnKeluarKelas.visibility = android.view.View.VISIBLE
+                        }
+                    }
+            }
+
         }
 
         btnDelete.setOnClickListener {
@@ -78,6 +87,7 @@ setupBackButton()
                 }
         }
 
+        // Tombol Keluar Kelas
         btnKeluarKelas.setOnClickListener {
             android.app.AlertDialog.Builder(this)
                 .setTitle("Keluar Kelas")
@@ -86,9 +96,6 @@ setupBackButton()
                 .setNegativeButton("Batal", null)
                 .show()
         }
-        // ===== END TAMBAHAN =====
-
-        loadProfile()
     }
 
     private fun loadProfile() {

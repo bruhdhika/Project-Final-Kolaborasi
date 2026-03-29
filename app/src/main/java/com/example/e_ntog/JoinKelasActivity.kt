@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
-class JoinKelasActivity : BaseActivity() {
+class JoinKelasActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
@@ -20,7 +20,7 @@ class JoinKelasActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_join_kelas)
-setupBackButton()
+
         session = SessionManager(this)
 
         val tvSambutan = findViewById<TextView>(R.id.tv_sambutan_join)

@@ -141,7 +141,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <include layout="@layout/layout_arrow" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Drawer menu (sama seperti HomeActivity) -->
@@ -153,4 +152,3 @@
         app:menu="@menu/menu_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
-

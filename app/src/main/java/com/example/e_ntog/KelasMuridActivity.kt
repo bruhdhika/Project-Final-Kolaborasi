@@ -139,7 +139,7 @@ class KelasMuridActivity : AppCompatActivity() {
         val tvLabel = dialogView.findViewById<TextView>(R.id.tv_dialog_label)
         tvLabel.text = "${murid.nama} — $label"
 
-        // Adapter inline dialog
+        // Adapter inline untuk dialog
         val izinAdapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
                 object : RecyclerView.ViewHolder(

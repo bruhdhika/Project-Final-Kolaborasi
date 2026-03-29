@@ -36,5 +36,4 @@
             android:background="@drawable/bg_button_red"
             android:paddingHorizontal="12dp" />
     </LinearLayout>
-    <include layout="@layout/layout_arrow" />
 </LinearLayout>

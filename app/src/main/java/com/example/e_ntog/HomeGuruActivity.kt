@@ -50,16 +50,14 @@ setupBackButton()
         // Setup RecyclerView
         adapter = KelasAdapter(
             kelasList,
-            { kelas ->
-                // Klik kelas (Sudah ada di kode Anda)
+            onKelasClick = { kelas ->
                 val intent = Intent(this, KelasMuridActivity::class.java)
-                intent.putExtra("KELAS_ID", kelas.kelasId)
+                intent.putExtra("KELAS_ID",   kelas.kelasId)
                 intent.putExtra("KELAS_NAMA", kelas.namaKelas)
                 intent.putExtra("KELAS_KODE", kelas.kodeKelas)
                 startActivity(intent)
             },
-            { kelas ->
-                // Klik Delete (TAMBAHAN BARU)
+            onDeleteClick = { kelas ->
                 showDialogHapusKelas(kelas)
             }
         )
@@ -161,9 +159,25 @@ setupBackButton()
     private fun showDialogHapusKelas(kelas: KelasModel) {
         AlertDialog.Builder(this)
             .setTitle("Hapus Kelas")
-            .setMessage("Apakah Anda yakin ingin menghapus kelas '${kelas.namaKelas}'? Semua data di dalamnya akan hilang.")
+            .setMessage("Yakin ingin menghapus kelas '${kelas.namaKelas}'?\nSemua murid di kelas ini akan otomatis keluar.")
             .setPositiveButton("Hapus") { _, _ ->
-                hapusKelas(kelas.kelasId)
+                db.collection("kelas").document(kelas.kelasId)
+                    .delete()
+                    .addOnSuccessListener {
+                        // Reset kelasId semua murid yang ada di kelas ini
+                        db.collection("users")
+                            .whereEqualTo("kelasId", kelas.kelasId)
+                            .get()
+                            .addOnSuccessListener { snaps ->
+                                snaps.forEach { doc ->
+                                    doc.reference.update("kelasId", "", "kelasNama", "")
+                                }
+                            }
+                        Toast.makeText(this, "Kelas '${kelas.namaKelas}' dihapus.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Gagal hapus: ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
             }
             .setNegativeButton("Batal", null)
             .show()
