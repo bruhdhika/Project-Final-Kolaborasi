@@ -87,6 +87,8 @@ class HomeActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
+                R.id.nav_chat_forum -> startActivity(Intent(this, ForumKelasActivity::class.java))
+                R.id.nav_announcement -> startActivity(Intent(this, AnnouncementActivity::class.java))
                 R.id.nav_logout  -> { auth.signOut(); session.clearSession(); goTo(LoginActivity::class.java) }
             }
             drawerLayout.closeDrawers(); true

@@ -17,7 +17,8 @@ data class WaliKelasModel(
 )
 
 class WaliKelasAdapter(
-    private val list: List<WaliKelasModel>
+    private val list: List<WaliKelasModel>,
+    private val onGuruClick: (WaliKelasModel) -> Unit // GANTI: Tambahkan ini
 ) : RecyclerView.Adapter<WaliKelasAdapter.ViewHolder>() {
 
     // Warna card bergantian — meniru desain lama
@@ -60,6 +61,9 @@ class WaliKelasAdapter(
         } else {
             holder.ivFoto.setImageResource(R.drawable.image_3)
         }
+
+        // Klik card → callback (TAMBAHAN SESUAI PERINTAH)
+        holder.cardWali.setOnClickListener { onGuruClick(guru) }
     }
 
     override fun getItemCount() = list.size

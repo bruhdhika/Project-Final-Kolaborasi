@@ -124,7 +124,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/bg_edittext_grey"
-                android:entries="@array/daftar_kelas"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:layout_marginTop="8dp"/>

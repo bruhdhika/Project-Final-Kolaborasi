@@ -35,6 +35,7 @@ class DispensasiActivity : BaseActivity() {
         setupBackButton()
 
         session = SessionManager(this)
+        loadKelasSpinner() // TAMBAHAN: Panggil di sini
 
         etNama      = findViewById(R.id.et_nama)
         spinnerKelas= findViewById(R.id.spinner_kelas)
@@ -66,10 +67,13 @@ class DispensasiActivity : BaseActivity() {
             val wali   = etWaliKelas.text.toString().trim()
 
             if (nama.isEmpty())   { etNama.error = "Nama wajib diisi"; return@setOnClickListener }
-            if (kelas == "Pilih Kelas...") {
-                Toast.makeText(this, "Pilih kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+
+            // PERUBAHAN: Validasi kelas kosong
+            if (kelas.isEmpty() || kelas == "Belum join kelas") {
+                Toast.makeText(this, "Kamu belum join kelas", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
             if (alasan.isEmpty()) { etAlasan.error = "Alasan wajib diisi"; return@setOnClickListener }
             if (wali.isEmpty())   {
                 Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
@@ -102,5 +106,29 @@ class DispensasiActivity : BaseActivity() {
                     Toast.makeText(this, "Gagal: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
+    }
+
+    // TAMBAHAN: Fungsi loadKelasSpinner
+    private fun loadKelasSpinner() {
+        val uid = session.getUid()
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { userDoc ->
+                val kelasId = userDoc.getString("kelasId") ?: ""
+                val kelasNama = userDoc.getString("kelasNama") ?: ""
+                if (kelasId.isEmpty()) {
+                    val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("Belum join kelas"))
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    spinnerKelas.adapter = adapter
+                    return@addOnSuccessListener
+                }
+                db.collection("kelas").document(kelasId).get()
+                    .addOnSuccessListener { kelasDoc ->
+                        val namaKelas = kelasDoc.getString("namaKelas") ?: kelasNama
+                        val items = listOf(namaKelas)
+                        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, items)
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        spinnerKelas.adapter = adapter
+                    }
+            }
     }
 }

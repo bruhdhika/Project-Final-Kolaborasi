@@ -18,10 +18,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Entog">
         <activity
-            android:name=".WaliKelasAdapter"
+            android:name=".ForumKelasActivity"
             android:exported="false" />
         <activity
-            android:name=".activity_home_guru"
+            android:name=".AnnouncementAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".AnnouncementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChatAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".ChatActivity"
             android:exported="false" />
         <activity
             android:name=".BaseActivity"

@@ -61,25 +61,36 @@ class KelasMuridActivity : AppCompatActivity() {
         rvMurid.layoutManager = LinearLayoutManager(this)
         rvMurid.adapter = adapter
 
-        // Load semua murid yang kelasId-nya == kelasId ini
-        db.collection("users")
-            .whereEqualTo("kelasId", kelasId)
-            .whereEqualTo("role", "murid")
-            .addSnapshotListener { snaps, _ ->
-                muridList.clear()
-                snaps?.forEach { doc ->
-                    muridList.add(MuridKelasModel(
-                        uid            = doc.id,
-                        nama           = doc.getString("nama") ?: "-",
-                        kelas          = doc.getString("kelas") ?: "-",
-                        totalTerlambat = doc.getLong("totalTerlambat")  ?: 0L,
-                        totalTidakHadir= doc.getLong("totalTidakHadir") ?: 0L,
-                        totalDispen    = doc.getLong("totalDispen")     ?: 0L
-                    ))
+            // GANTI bagian loadMurid di KelasMuridActivity.kt:
+            db.collection("users")
+                .whereEqualTo("kelasId", kelasId)
+                .addSnapshotListener { snaps, error ->
+                    if (error != null) {
+                        Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                        return@addSnapshotListener
+                    }
+                    muridList.clear()
+                    snaps?.forEach { doc ->
+                        // Filter role murid di sisi client
+                        val role = doc.getString("role") ?: ""
+                        if (role == "murid") {
+                            muridList.add(
+                                MuridKelasModel(
+                                    uid = doc.id,
+                                    nama = doc.getString("nama") ?: "-",
+                                    kelas = doc.getString("kelasNama") ?: "-",
+                                    totalTerlambat = doc.getLong("totalTerlambat") ?: 0L,
+                                    totalTidakHadir = doc.getLong("totalTidakHadir") ?: 0L,
+                                    totalDispen = doc.getLong("totalDispen") ?: 0L
+                                )
+                            )
+                        }
+                    }
+                    adapter.notifyDataSetChanged()
+                    tvEmpty.visibility = if (muridList.isEmpty()) View.VISIBLE else View.GONE
+                    rvMurid.visibility = if (muridList.isEmpty()) View.GONE else View.VISIBLE
                 }
-                adapter.notifyDataSetChanged()
-                tvEmpty.visibility = if (muridList.isEmpty()) View.VISIBLE else View.GONE
-            }
+
     }
 
     // Dialog: pilih tipe izin yang ingin dilihat

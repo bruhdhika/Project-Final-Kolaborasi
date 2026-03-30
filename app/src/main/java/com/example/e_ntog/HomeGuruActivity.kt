@@ -69,6 +69,8 @@ setupBackButton()
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
+                R.id.nav_chat_forum -> startActivity(Intent(this, ForumKelasActivity::class.java))
+                R.id.nav_announcement -> startActivity(Intent(this, AnnouncementActivity::class.java))
                 R.id.nav_logout  -> {
                     auth.signOut(); session.clearSession()
                     startActivity(Intent(this, LoginActivity::class.java).apply {
@@ -91,18 +93,38 @@ setupBackButton()
             .whereEqualTo("guruUid", session.getUid())
             .addSnapshotListener { snaps, _ ->
                 kelasList.clear()
-                snaps?.forEach { doc ->
-                    kelasList.add(KelasModel(
-                        kelasId    = doc.id,
-                        namaKelas  = doc.getString("namaKelas")  ?: "",
-                        kodeKelas  = doc.getString("kodeKelas")  ?: "",
-                        jumlahMurid= doc.getLong("jumlahMurid")  ?: 0L
-                    ))
+                val docs = snaps?.documents ?: emptyList()
+                if (docs.isEmpty()) {
+                    adapter.notifyDataSetChanged()
+                    tvEmpty.visibility = View.VISIBLE
+                    return@addSnapshotListener
                 }
-                adapter.notifyDataSetChanged()
-                tvEmpty.visibility = if (kelasList.isEmpty()) View.VISIBLE else View.GONE
+                tvEmpty.visibility = View.GONE
+                var loaded = 0
+                docs.forEach { doc ->
+                    val kelasId = doc.id
+                    // Hitung murid secara realtime dari collection users
+                    db.collection("users")
+                        .whereEqualTo("kelasId", kelasId)
+                        .get()
+                        .addOnSuccessListener { muridSnap ->
+                            val jumlah = muridSnap.documents
+                                .count { it.getString("role") == "murid" }
+                            kelasList.add(KelasModel(
+                                kelasId     = kelasId,
+                                namaKelas   = doc.getString("namaKelas") ?: "",
+                                kodeKelas   = doc.getString("kodeKelas") ?: "",
+                                jumlahMurid = jumlah.toLong()
+                            ))
+                            loaded++
+                            if (loaded == docs.size) {
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
+                }
             }
     }
+
 
     private fun showDialogBuatKelas() {
         val etNamaKelas = EditText(this).apply {

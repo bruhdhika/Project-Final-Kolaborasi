@@ -1,60 +1,47 @@
 package com.example.e_ntog
 
-import android.app.Activity // <-- IMPORT INI
-import android.content.Intent // <-- IMPORT INI
-import android.graphics.Color
+import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatButton // <-- IMPORT INI
-import androidx.constraintlayout.widget.ConstraintLayout
+import com.bumptech.glide.Glide
 
 class DetailWaliActivity : BaseActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_wali)
-
         setupBackButton()
 
-        // 1. Ambil data yang dikirim dari Intent
-        val namaDepan = intent.getStringExtra("NAMA_DEPAN")
-        val namaBelakang = intent.getStringExtra("NAMA_BELAKANG")
-        val fotoResId = intent.getIntExtra("FOTO_ID", R.drawable.boy)
-        val warnaBg = intent.getStringExtra("WARNA_BG") ?: "#F5F5F5"
+        // Terima data dinamis dari WaliKelasActivity
+        val guruUid    = intent.getStringExtra("GURU_UID")   ?: ""
+        val guruNama   = intent.getStringExtra("GURU_NAMA")  ?: "-"
+        val guruKelas  = intent.getStringExtra("GURU_KELAS") ?: "-"
+        val guruPhoto  = intent.getStringExtra("GURU_PHOTO") ?: ""
 
-        // 2. Temukan komponen di layout
-        val tvNamaDepan = findViewById<TextView>(R.id.tv_nama_depan)
+        val tvNamaDepan    = findViewById<TextView>(R.id.tv_nama_depan)
         val tvNamaBelakang = findViewById<TextView>(R.id.tv_nama_belakang)
-        val ivFotoDetail = findViewById<ImageView>(R.id.iv_wali_photo_detail)
-        val clBackground = findViewById<ConstraintLayout>(R.id.cl_wali_background)
-        val backButton = findViewById<ImageView>(R.id.iv_back_arrow)
-        val btnKirimPesan = findViewById<AppCompatButton>(R.id.btn_kirim_pesan) // <-- TEMUKAN TOMBOL
+        val ivFoto         = findViewById<ImageView>(R.id.iv_wali_photo_detail)
+        val btnKirimPesan  = findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btn_kirim_pesan)
 
-        // 3. Set data ke komponen
-        tvNamaDepan.text = namaDepan
-        tvNamaBelakang.text = namaBelakang
-        ivFotoDetail.setImageResource(fotoResId)
-        clBackground.setBackgroundColor(Color.parseColor(warnaBg))
+        // Pisah nama jadi 2 bagian (depan & belakang) untuk layout yang sudah ada
+        val namaParts = guruNama.split(" ")
+        tvNamaDepan.text    = namaParts.firstOrNull() ?: guruNama
+        tvNamaBelakang.text = if (namaParts.size > 1) namaParts.drop(1).joinToString(" ") else guruKelas
 
-        // 4. Aktifkan tombol back
-        backButton.setOnClickListener {
-            finish()
+        // Load foto guru
+        if (guruPhoto.isNotEmpty()) {
+            Glide.with(this).load(guruPhoto).placeholder(R.drawable.image_3).into(ivFoto)
+        } else {
+            ivFoto.setImageResource(R.drawable.image_3)
         }
 
-        // 5. Aktifkan tombol "Kirim Pesan"
+        // Tombol Kirim Pesan → buka ChatActivity
         btnKirimPesan.setOnClickListener {
-            // Buat Intent untuk "hasil"
-            val resultIntent = Intent()
-            // Masukkan nama lengkap wali kelas ke dalam hasil
-            val namaWaliLengkap = "$namaDepan $namaBelakang"
-            resultIntent.putExtra("NAMA_WALI_TERPILIH", namaWaliLengkap)
-
-            // Set hasilnya sebagai "OK" dan kirim datanya
-            setResult(Activity.RESULT_OK, resultIntent)
-
-            // Tutup halaman ini
-            finish()
+            val intent = Intent(this, ChatActivity::class.java)
+            intent.putExtra("OTHER_UID",  guruUid)
+            intent.putExtra("OTHER_NAMA", guruNama)
+            startActivity(intent)
         }
     }
 }

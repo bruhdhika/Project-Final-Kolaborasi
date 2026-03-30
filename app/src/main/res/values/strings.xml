@@ -1,14 +1,5 @@
 <resources>
     <string name="app_name">e_ntog</string>
 
-    <string-array name="daftar_kelas">
-        <item>Pilih Kelas...</item>
-        <item>X PPLG 1</item>
-        <item>X PPLG 2</item>
-        <item>X PPLG 3</item>
-        <item>XI RPL 1</item>
-        <item>XI RPL 2</item>
-        <item>XI RPL 3</item>
-    </string-array>
 
 </resources>

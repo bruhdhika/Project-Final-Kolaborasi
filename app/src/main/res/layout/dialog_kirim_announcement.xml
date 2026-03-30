@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/et_anno_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Judul Pengumuman"
+        android:inputType="textCapSentences"
+        android:padding="10dp"
+        android:background="@drawable/input" />
+
+    <EditText
+        android:id="@+id/et_anno_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Isi pengumuman..."
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:padding="10dp"
+        android:background="@drawable/bg_edittext_grey" />
+</LinearLayout>
