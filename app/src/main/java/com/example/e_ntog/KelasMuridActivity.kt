@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-// Model untuk 1 murid di kelas
 data class MuridKelasModel(
     val uid: String = "",
     val nama: String = "",
@@ -20,13 +19,12 @@ data class MuridKelasModel(
     val totalDispen: Long = 0L
 )
 
-// Model untuk 1 pengajuan izin
 data class IzinModel(
     val docId: String = "",
     val tanggal: String = "",
     val alasan: String = "",
     val status: String = "pending",
-    val tipe: String = ""       // 'terlambat' | 'dispen' | 'tidak_hadir'
+    val tipe: String = ""
 )
 
 class KelasMuridActivity : AppCompatActivity() {
@@ -43,68 +41,54 @@ class KelasMuridActivity : AppCompatActivity() {
         val kelasNama = intent.getStringExtra("KELAS_NAMA") ?: ""
         val kelasKode = intent.getStringExtra("KELAS_KODE") ?: ""
 
-        val tvJudul    = findViewById<TextView>(R.id.tv_judul_kelas)
-        val tvKode     = findViewById<TextView>(R.id.tv_kode_kelas_detail)
-        val rvMurid    = findViewById<RecyclerView>(R.id.rv_murid_kelas)
-        val tvEmpty    = findViewById<TextView>(R.id.tv_empty_murid)
-        val btnBack    = findViewById<ImageView>(R.id.iv_back_arrow)
+        val tvJudul = findViewById<TextView>(R.id.tv_judul_kelas)
+        val tvKode  = findViewById<TextView>(R.id.tv_kode_kelas_detail)
+        val rvMurid = findViewById<RecyclerView>(R.id.rv_murid_kelas)
+        val tvEmpty = findViewById<TextView>(R.id.tv_empty_murid)
+        val btnBack = findViewById<ImageView>(R.id.iv_back_arrow)
 
         tvJudul.text = kelasNama
         tvKode.text  = "Kode Kelas: $kelasKode"
-
         btnBack.setOnClickListener { finish() }
 
-        // Setup adapter — klik murid → tampil dialog pilih tipe izin
-        adapter = MuridKelasAdapter(muridList) { murid ->
-            showPilihTipeIzinDialog(murid)
-        }
+        adapter = MuridKelasAdapter(muridList) { murid -> showPilihTipeIzinDialog(murid) }
         rvMurid.layoutManager = LinearLayoutManager(this)
         rvMurid.adapter = adapter
 
-            // GANTI bagian loadMurid di KelasMuridActivity.kt:
-            db.collection("users")
-                .whereEqualTo("kelasId", kelasId)
-                .addSnapshotListener { snaps, error ->
-                    if (error != null) {
-                        Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
-                        return@addSnapshotListener
-                    }
-                    muridList.clear()
-                    snaps?.forEach { doc ->
-                        // Filter role murid di sisi client
-                        val role = doc.getString("role") ?: ""
-                        if (role == "murid") {
-                            muridList.add(
-                                MuridKelasModel(
-                                    uid = doc.id,
-                                    nama = doc.getString("nama") ?: "-",
-                                    kelas = doc.getString("kelasNama") ?: "-",
-                                    totalTerlambat = doc.getLong("totalTerlambat") ?: 0L,
-                                    totalTidakHadir = doc.getLong("totalTidakHadir") ?: 0L,
-                                    totalDispen = doc.getLong("totalDispen") ?: 0L
-                                )
-                            )
-                        }
-                    }
-                    adapter.notifyDataSetChanged()
-                    tvEmpty.visibility = if (muridList.isEmpty()) View.VISIBLE else View.GONE
-                    rvMurid.visibility = if (muridList.isEmpty()) View.GONE else View.VISIBLE
+        // ── Query tunggal, filter role di sisi klien (tidak butuh composite index) ──
+        db.collection("users")
+            .whereEqualTo("kelasId", kelasId)
+            .addSnapshotListener { snaps, error ->
+                if (error != null) {
+                    Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
                 }
-
+                muridList.clear()
+                snaps?.forEach { doc ->
+                    if (doc.getString("role") == "murid") {
+                        muridList.add(MuridKelasModel(
+                            uid             = doc.id,
+                            nama            = doc.getString("nama")           ?: "-",
+                            kelas           = doc.getString("kelasNama")      ?: "-",
+                            totalTerlambat  = doc.getLong("totalTerlambat")   ?: 0L,
+                            totalTidakHadir = doc.getLong("totalTidakHadir")  ?: 0L,
+                            totalDispen     = doc.getLong("totalDispen")      ?: 0L
+                        ))
+                    }
+                }
+                adapter.notifyDataSetChanged()
+                tvEmpty.visibility = if (muridList.isEmpty()) View.VISIBLE else View.GONE
+                rvMurid.visibility = if (muridList.isEmpty()) View.GONE   else View.VISIBLE
+            }
     }
 
-    // Dialog: pilih tipe izin yang ingin dilihat
     private fun showPilihTipeIzinDialog(murid: MuridKelasModel) {
         val tipes = arrayOf(
             "Terlambat (${murid.totalTerlambat}x)",
             "Tidak Hadir (${murid.totalTidakHadir}x)",
             "Dispensasi (${murid.totalDispen}x)"
         )
-        val subcollections = arrayOf(
-            "history_terlambat",
-            "history_tidak_hadir",
-            "history_dispen"
-        )
+        val subcollections = arrayOf("history_terlambat", "history_tidak_hadir", "history_dispen")
 
         AlertDialog.Builder(this)
             .setTitle("${murid.nama} — Pilih Jenis Izin")
@@ -115,7 +99,6 @@ class KelasMuridActivity : AppCompatActivity() {
             .show()
     }
 
-    // Load list izin dari subcollection, lalu tampilkan dialog approve/reject
     private fun loadIzinMurid(murid: MuridKelasModel, subcollection: String, label: String) {
         db.collection("users").document(murid.uid)
             .collection(subcollection)
@@ -126,7 +109,6 @@ class KelasMuridActivity : AppCompatActivity() {
                     Toast.makeText(this, "Belum ada riwayat $label", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
-
                 val izinList = docs.map { doc ->
                     IzinModel(
                         docId   = doc.id,
@@ -136,21 +118,22 @@ class KelasMuridActivity : AppCompatActivity() {
                         tipe    = subcollection
                     )
                 }
-
                 showIzinListDialog(murid, izinList, label)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal load riwayat: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Dialog list izin + tombol Setujui/Tolak per item
-    private fun showIzinListDialog(
-        murid: MuridKelasModel, izinList: List<IzinModel>, label: String
-    ) {
+    private fun showIzinListDialog(murid: MuridKelasModel, izinList: List<IzinModel>, label: String) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_izin_list, null)
-        val rvIzin = dialogView.findViewById<RecyclerView>(R.id.rv_izin_list)
+        val rvIzin  = dialogView.findViewById<RecyclerView>(R.id.rv_izin_list)
         val tvLabel = dialogView.findViewById<TextView>(R.id.tv_dialog_label)
         tvLabel.text = "${murid.nama} — $label"
 
-        // Adapter inline untuk dialog
+        // Buat list yang bisa dimutasi agar bisa refresh setelah approve/reject
+        val mutableIzinList = izinList.toMutableList()
+
         val izinAdapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
                 object : RecyclerView.ViewHolder(
@@ -158,19 +141,18 @@ class KelasMuridActivity : AppCompatActivity() {
                         .inflate(R.layout.item_izin_guru, parent, false)
                 ) {}
 
-            override fun getItemCount() = izinList.size
+            override fun getItemCount() = mutableIzinList.size
 
             override fun onBindViewHolder(holder: RecyclerView.ViewHolder, pos: Int) {
-                val izin = izinList[pos]
+                val izin = mutableIzinList[pos]
                 val view = holder.itemView
                 view.findViewById<TextView>(R.id.tv_izin_tanggal).text = izin.tanggal
                 view.findViewById<TextView>(R.id.tv_izin_alasan).text  = izin.alasan
 
-                val tvStatus = view.findViewById<TextView>(R.id.tv_izin_status)
+                val tvStatus   = view.findViewById<TextView>(R.id.tv_izin_status)
                 val btnSetujui = view.findViewById<Button>(R.id.btn_setujui)
                 val btnTolak   = view.findViewById<Button>(R.id.btn_tolak)
 
-                // Tampilan status
                 when (izin.status) {
                     "disetujui" -> {
                         tvStatus.text = "✅ Disetujui"
@@ -192,13 +174,15 @@ class KelasMuridActivity : AppCompatActivity() {
                     }
                 }
 
-                // Tombol Setujui
                 btnSetujui.setOnClickListener {
                     updateStatusIzin(murid.uid, izin.tipe, izin.docId, "disetujui")
+                    mutableIzinList[pos] = izin.copy(status = "disetujui")
+                    notifyItemChanged(pos)
                 }
-                // Tombol Tolak
                 btnTolak.setOnClickListener {
                     updateStatusIzin(murid.uid, izin.tipe, izin.docId, "ditolak")
+                    mutableIzinList[pos] = izin.copy(status = "ditolak")
+                    notifyItemChanged(pos)
                 }
             }
         }
@@ -220,7 +204,7 @@ class KelasMuridActivity : AppCompatActivity() {
             .update("status", statusBaru)
             .addOnSuccessListener {
                 val label = if (statusBaru == "disetujui") "disetujui ✅" else "ditolak ❌"
-                Toast.makeText(this, "Izin berhasil $label", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Izin $label", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Gagal update: ${it.message}", Toast.LENGTH_SHORT).show()

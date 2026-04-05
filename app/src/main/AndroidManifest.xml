@@ -17,90 +17,42 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Entog">
-        <activity
-            android:name=".ForumKelasActivity"
-            android:exported="false" />
-        <activity
-            android:name=".AnnouncementAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".AnnouncementActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ChatAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".ChatActivity"
-            android:exported="false" />
-        <activity
-            android:name=".BaseActivity"
-            android:exported="false" />
-        <activity
-            android:name=".JoinKelasActivity"
-            android:exported="false" />
-        <activity
-            android:name=".KelasMuridActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeGuruActivity"
-            android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SignInActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SignUpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".EditDataActivity"
-            android:exported="false" />
-        <activity
-            android:name=".NamaEmailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OtpActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TerlambatActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DispensasiActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TidakHadirActivity"
-            android:exported="false" />
-        <activity
-            android:name=".WaliKelasActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DetailWaliActivity"
-            android:exported="false" />
-        <activity
-            android:name=".StrukActivity"
-            android:exported="false" />
-        <activity
-            android:name=".StrukDispensasi"
-            android:exported="false" />
-        <activity
-            android:name=".StrukTidakHadir"
-            android:exported="false" /> <!-- MainActivity tidak dipakai sebagai screen, hanya sebagai referensi -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
+
+        <activity android:name=".SignInActivity"       android:exported="false" />
+        <activity android:name=".SignUpActivity"       android:exported="false" />
+        <activity android:name=".HomeActivity"         android:exported="false" />
+        <activity android:name=".HomeGuruActivity"     android:exported="false" />
+        <activity android:name=".JoinKelasActivity"    android:exported="false" />
+        <activity android:name=".KelasMuridActivity"   android:exported="false" />
+        <activity android:name=".ProfileActivity"      android:exported="false" />
+        <activity android:name=".EditDataActivity"     android:exported="false" />
+        <activity android:name=".NamaEmailActivity"    android:exported="false" />
+        <activity android:name=".OtpActivity"          android:exported="false" />
+        <activity android:name=".TerlambatActivity"    android:exported="false" />
+        <activity android:name=".DispensasiActivity"   android:exported="false" />
+        <activity android:name=".TidakHadirActivity"   android:exported="false" />
+        <activity android:name=".WaliKelasActivity"    android:exported="false" />
+        <activity android:name=".DetailWaliActivity"   android:exported="false" />
+        <activity android:name=".StrukActivity"        android:exported="false" />
+        <activity android:name=".StrukDispensasi"      android:exported="false" />
+        <activity android:name=".StrukTidakHadir"      android:exported="false" />
+        <activity android:name=".ChatActivity"         android:exported="false" />
+        <activity android:name=".ForumKelasActivity"   android:exported="false" />
+        <activity android:name=".AnnouncementActivity" android:exported="false" />
+        <activity android:name=".MainActivity"         android:exported="false" />
+
+        <!-- DIHAPUS dari versi lama (bukan Activity):
+             .WaliKelasAdapter, .activity_home_guru, .AnnouncementAdapter, .ChatAdapter, .BaseActivity -->
+
     </application>
 
 </manifest>

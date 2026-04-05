@@ -3,7 +3,6 @@ package com.example.e_ntog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.card.MaterialCardView
@@ -11,7 +10,8 @@ import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class HomeActivity : AppCompatActivity() {
+// Extend BaseActivity agar setupBackButton() tersedia
+class HomeActivity : BaseActivity() {
 
     private val auth  = FirebaseAuth.getInstance()
     private val db    = FirebaseFirestore.getInstance()
@@ -22,43 +22,38 @@ class HomeActivity : AppCompatActivity() {
 
         session = SessionManager(this)
 
-        // Guard: jika tidak login, ke LoginActivity
         if (auth.currentUser == null) {
             goTo(LoginActivity::class.java); return
         }
 
-
-
-        // ROUTING BERDASARKAN ROLE
         when (session.getRole()) {
             SessionManager.ROLE_GURU -> {
-                // Guru langsung ke dashboard guru
                 goTo(HomeGuruActivity::class.java); return
             }
             SessionManager.ROLE_MURID -> {
-                // Murid: cek apakah sudah join kelas
                 val uid = session.getUid()
                 db.collection("users").document(uid).get()
                     .addOnSuccessListener { snap ->
                         val kelasId = snap.getString("kelasId") ?: ""
                         if (kelasId.isEmpty()) {
-                            // Belum punya kelas → wajib join dulu
-                            goTo(JoinKelasActivity::class.java); return@addOnSuccessListener
+                            goTo(JoinKelasActivity::class.java)
+                        } else {
+                            showMuridDashboard()
                         }
-                        // Sudah punya kelas → tampilkan dashboard murid
-                        showMuridDashboard()
                     }
                     .addOnFailureListener {
-                        // Jika gagal load, tetap tampilkan dashboard
                         showMuridDashboard()
                     }
             }
-            else -> showMuridDashboard() // fallback
+            else -> showMuridDashboard()
         }
     }
 
     private fun showMuridDashboard() {
         setContentView(R.layout.activity_home)
+
+        // setupBackButton() harus dipanggil SETELAH setContentView
+        setupBackButton()
 
         val drawerLayout   = findViewById<DrawerLayout>(R.id.drawerLayout)
         val navigationView = findViewById<NavigationView>(R.id.navigationView)
@@ -73,7 +68,7 @@ class HomeActivity : AppCompatActivity() {
 
         tvGreeting.text = "Hi ${session.getNama()}"
 
-        // Load counter realtime dari Firestore
+        // Counter realtime dari Firestore
         db.collection("users").document(session.getUid())
             .addSnapshotListener { snap, _ ->
                 if (snap == null) return@addSnapshotListener
@@ -86,17 +81,22 @@ class HomeActivity : AppCompatActivity() {
 
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
-                R.id.nav_chat_forum -> startActivity(Intent(this, ForumKelasActivity::class.java))
+                R.id.nav_profile      -> startActivity(Intent(this, ProfileActivity::class.java))
+                R.id.nav_chat_forum   -> startActivity(Intent(this, ForumKelasActivity::class.java))
                 R.id.nav_announcement -> startActivity(Intent(this, AnnouncementActivity::class.java))
-                R.id.nav_logout  -> { auth.signOut(); session.clearSession(); goTo(LoginActivity::class.java) }
+                R.id.nav_logout       -> {
+                    auth.signOut()
+                    session.clearSession()
+                    goTo(LoginActivity::class.java)
+                }
             }
-            drawerLayout.closeDrawers(); true
+            drawerLayout.closeDrawers()
+            true
         }
 
-        cardTerlambat.setOnClickListener  { startActivity(Intent(this, TerlambatActivity::class.java)) }
-        cardIzinHadir.setOnClickListener  { startActivity(Intent(this, TidakHadirActivity::class.java)) }
-        cardDispen.setOnClickListener     { startActivity(Intent(this, DispensasiActivity::class.java)) }
+        cardTerlambat.setOnClickListener { startActivity(Intent(this, TerlambatActivity::class.java)) }
+        cardIzinHadir.setOnClickListener { startActivity(Intent(this, TidakHadirActivity::class.java)) }
+        cardDispen.setOnClickListener    { startActivity(Intent(this, DispensasiActivity::class.java)) }
     }
 
     private fun goTo(cls: Class<*>) {
@@ -105,4 +105,3 @@ class HomeActivity : AppCompatActivity() {
         })
     }
 }
-

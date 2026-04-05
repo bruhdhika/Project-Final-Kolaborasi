@@ -18,21 +18,20 @@ data class WaliKelasModel(
 
 class WaliKelasAdapter(
     private val list: List<WaliKelasModel>,
-    private val onGuruClick: (WaliKelasModel) -> Unit // GANTI: Tambahkan ini
+    private val onGuruClick: (WaliKelasModel) -> Unit
 ) : RecyclerView.Adapter<WaliKelasAdapter.ViewHolder>() {
 
-    // Warna card bergantian — meniru desain lama
     private val cardColors = listOf(
         "#4CAF50", "#3F51B5", "#E53935",
         "#1E88E5", "#FB8C00", "#8E24AA"
     )
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val cardWali:  MaterialCardView  = view.findViewById(R.id.card_wali)
-        val clCardBg:  ConstraintLayout  = view.findViewById(R.id.cl_card_bg)
-        val ivFoto:    CircleImageView   = view.findViewById(R.id.iv_guru_foto)
-        val tvNama:    TextView          = view.findViewById(R.id.tv_guru_nama)
-        val tvKelas:   TextView          = view.findViewById(R.id.tv_guru_kelas)
+        val cardWali: MaterialCardView = view.findViewById(R.id.card_wali)
+        val clCardBg: ConstraintLayout = view.findViewById(R.id.cl_card_bg)
+        val ivFoto:   CircleImageView  = view.findViewById(R.id.iv_guru_foto)
+        val tvNama:   TextView         = view.findViewById(R.id.tv_guru_nama)
+        val tvKelas:  TextView         = view.findViewById(R.id.tv_guru_kelas)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,14 +43,12 @@ class WaliKelasAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val guru = list[position]
 
-        // Warna card acak berdasarkan posisi
-        val warna = cardColors[position % cardColors.size]
-        holder.clCardBg.setBackgroundColor(Color.parseColor(warna))
-
+        holder.clCardBg.setBackgroundColor(
+            Color.parseColor(cardColors[position % cardColors.size])
+        )
         holder.tvNama.text  = guru.nama
         holder.tvKelas.text = guru.namaKelas.ifEmpty { "Belum memiliki kelas" }
 
-        // Load foto profil guru via Glide
         if (guru.photoUrl.isNotEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(guru.photoUrl)
@@ -62,7 +59,6 @@ class WaliKelasAdapter(
             holder.ivFoto.setImageResource(R.drawable.image_3)
         }
 
-        // Klik card → callback (TAMBAHAN SESUAI PERINTAH)
         holder.cardWali.setOnClickListener { onGuruClick(guru) }
     }
 

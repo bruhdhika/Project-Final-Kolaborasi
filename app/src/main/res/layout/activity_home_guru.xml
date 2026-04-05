@@ -7,14 +7,12 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Header biru gradient guru -->
+        <!-- Header gambar -->
         <ImageView
             android:id="@+id/iv_header"
             android:layout_width="0dp"
@@ -25,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Icon menu (drawer) -->
+        <!-- Icon hamburger menu -->
         <ImageView
             android:id="@+id/iv_header_icon"
             android:layout_width="30dp"
@@ -82,8 +80,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_guru_greeting" />
 
-        <!-- Area putih melengkung + RecyclerView -->
-        <ScrollView
+        <!-- Area putih melengkung -->
+        <!-- Gunakan NestedScrollView agar RecyclerView bisa scroll di dalamnya -->
+        <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="150dp"
@@ -97,7 +96,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="24dp"
+                android:paddingBottom="100dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -117,18 +117,19 @@
                     android:gravity="center"
                     android:textColor="#9E9E9E"
                     android:textSize="15sp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:paddingVertical="40dp" />
 
-                <!-- RecyclerView list kelas -->
+                <!-- RecyclerView list kelas — nestedScrollingEnabled false agar tidak konflik -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_kelas"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="false"
+                    android:clipToPadding="false" />
 
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <!-- FAB Tambah Kelas -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -143,6 +144,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- layout_arrow (fabNext back button) -->
         <include
             layout="@layout/layout_arrow"
             android:layout_width="wrap_content"
@@ -152,7 +154,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Drawer menu (sama seperti HomeActivity) -->
+    <!-- Drawer navigation -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"

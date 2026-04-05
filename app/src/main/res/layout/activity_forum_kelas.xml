@@ -1,96 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
-    tools:context=".ForumKelasActivity">
+    android:background="#F8F9FA">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_header"
-        android:layout_width="match_parent"
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/header_forum"
+        android:layout_width="0dp"
         android:layout_height="60dp"
-        android:background="@android:color/white"
-        android:elevation="4dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="#1565C0"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- ID iv_back_forum digunakan di ForumKelasActivity -->
         <ImageView
             android:id="@+id/iv_back_forum"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="12dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_logo"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@android:color/black" />
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="#FFFFFF"
+            android:layout_marginEnd="12dp"
+            android:padding="4dp" />
 
         <TextView
             android:id="@+id/tv_forum_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:text="Forum Kelas"
-            android:textColor="@android:color/black"
+            android:textColor="#FFFFFF"
             android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_back_forum"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textStyle="bold" />
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <!-- List pesan forum -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_forum"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="12dp"
-        app:layout_constraintBottom_toTopOf="@id/cl_input_area"
-        app:layout_constraintTop_toBottomOf="@id/cl_header" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_input_area"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/header_forum"
+        app:layout_constraintBottom_toTopOf="@id/input_bar_forum"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Input bar -->
+    <LinearLayout
+        android:id="@+id/input_bar_forum"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <EditText
             android:id="@+id/et_forum_pesan"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_edittext_grey"
             android:hint="Tulis pesan ke kelas..."
             android:inputType="textMultiLine"
             android:maxLines="4"
-            android:minHeight="48dp"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:textSize="15sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/iv_forum_kirim"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:padding="12dp"
+            android:layout_marginEnd="8dp" />
 
+        <!-- ID iv_forum_kirim digunakan di ForumKelasActivity -->
         <ImageView
             android:id="@+id/iv_forum_kirim"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_button_blue"
+            android:src="@android:drawable/ic_menu_send"
+            android:background="#1565C0"
             android:padding="12dp"
-            android:src="@drawable/running"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@android:color/white" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+    <include layout="@layout/layout_arrow" />
 </androidx.constraintlayout.widget.ConstraintLayout>

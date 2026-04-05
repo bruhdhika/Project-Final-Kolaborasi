@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5">
 
-    <!-- Header -->
+    <!-- Header biru -->
     <LinearLayout
         android:id="@+id/header_chat"
         android:layout_width="0dp"
@@ -21,16 +21,22 @@
 
         <ImageView
             android:id="@+id/iv_back_chat"
-            android:layout_width="32dp" android:layout_height="32dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#FFFFFF" android:layout_marginEnd="12dp"/>
+            app:tint="#FFFFFF"
+            android:layout_marginEnd="12dp"
+            android:padding="4dp" />
 
         <TextView
             android:id="@+id/tv_chat_title"
-            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Nama Guru"
-            android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold"/>
+            android:text="Chat"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- List pesan -->
@@ -60,22 +66,24 @@
 
         <EditText
             android:id="@+id/et_pesan_chat"
-            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_edittext_grey"
             android:hint="Ketik pesan..."
             android:inputType="textMultiLine"
             android:maxLines="4"
             android:padding="12dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp" />
 
         <ImageView
             android:id="@+id/iv_btn_kirim"
-            android:layout_width="48dp" android:layout_height="48dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:src="@android:drawable/ic_menu_send"
             android:background="#1565C0"
             android:padding="12dp"
-            app:tint="#FFFFFF"/>
+            app:tint="#FFFFFF" />
     </LinearLayout>
-
+    <include layout="@layout/layout_arrow" />
 </androidx.constraintlayout.widget.ConstraintLayout>

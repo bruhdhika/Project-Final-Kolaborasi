@@ -3,15 +3,14 @@ package com.example.e_ntog
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,8 +24,8 @@ data class KelasModel(
 
 class HomeGuruActivity : BaseActivity() {
 
-    private val auth    = FirebaseAuth.getInstance()
-    private val db      = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val db   = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
     private val kelasList = mutableListOf<KelasModel>()
     private lateinit var adapter: KelasAdapter
@@ -34,9 +33,10 @@ class HomeGuruActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_guru)
+        setupBackButton()
 
         session = SessionManager(this)
-setupBackButton()
+
         val tvGreeting     = findViewById<TextView>(R.id.tv_guru_greeting)
         val rvKelas        = findViewById<RecyclerView>(R.id.rv_kelas)
         val fabTambah      = findViewById<FloatingActionButton>(R.id.fab_tambah_kelas)
@@ -47,31 +47,29 @@ setupBackButton()
 
         tvGreeting.text = "Halo, ${session.getNama()}"
 
-        // Setup RecyclerView
+        // ── Setup RecyclerView ──────────────────────────────────────────────
         adapter = KelasAdapter(
             kelasList,
             onKelasClick = { kelas ->
-                val intent = Intent(this, KelasMuridActivity::class.java)
-                intent.putExtra("KELAS_ID",   kelas.kelasId)
-                intent.putExtra("KELAS_NAMA", kelas.namaKelas)
-                intent.putExtra("KELAS_KODE", kelas.kodeKelas)
-                startActivity(intent)
+                startActivity(Intent(this, KelasMuridActivity::class.java).apply {
+                    putExtra("KELAS_ID",   kelas.kelasId)
+                    putExtra("KELAS_NAMA", kelas.namaKelas)
+                    putExtra("KELAS_KODE", kelas.kodeKelas)
+                })
             },
-            onDeleteClick = { kelas ->
-                showDialogHapusKelas(kelas)
-            }
+            onDeleteClick = { kelas -> showDialogHapusKelas(kelas) }
         )
         rvKelas.layoutManager = LinearLayoutManager(this)
         rvKelas.adapter = adapter
 
-        // Drawer menu
+        // ── Drawer ─────────────────────────────────────────────────────────
         ivMenuIcon.setOnClickListener { drawerLayout.openDrawer(GravityCompat.END) }
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
-                R.id.nav_chat_forum -> startActivity(Intent(this, ForumKelasActivity::class.java))
+                R.id.nav_profile      -> startActivity(Intent(this, ProfileActivity::class.java))
+                R.id.nav_chat_forum   -> startActivity(Intent(this, ForumKelasActivity::class.java))
                 R.id.nav_announcement -> startActivity(Intent(this, AnnouncementActivity::class.java))
-                R.id.nav_logout  -> {
+                R.id.nav_logout       -> {
                     auth.signOut(); session.clearSession()
                     startActivity(Intent(this, LoginActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -81,29 +79,38 @@ setupBackButton()
             drawerLayout.closeDrawers(); true
         }
 
-        // FAB: buat kelas baru
         fabTambah.setOnClickListener { showDialogBuatKelas() }
 
-        // Load semua kelas milik guru ini dari Firestore
-        loadKelasList(tvEmpty)
+        // ── Load kelas realtime ─────────────────────────────────────────────
+        loadKelasList(tvEmpty, rvKelas)
     }
 
-    private fun loadKelasList(tvEmpty: TextView) {
+    private fun loadKelasList(tvEmpty: TextView, rvKelas: RecyclerView) {
         db.collection("kelas")
             .whereEqualTo("guruUid", session.getUid())
-            .addSnapshotListener { snaps, _ ->
-                kelasList.clear()
-                val docs = snaps?.documents ?: emptyList()
-                if (docs.isEmpty()) {
-                    adapter.notifyDataSetChanged()
-                    tvEmpty.visibility = View.VISIBLE
+            .addSnapshotListener { snaps, error ->
+                if (error != null) {
+                    Toast.makeText(this, "Error load kelas: ${error.message}", Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
+
+                val docs = snaps?.documents ?: emptyList()
+                kelasList.clear()
+
+                if (docs.isEmpty()) {
+                    adapter.notifyDataSetChanged()
+                    tvEmpty.visibility  = View.VISIBLE
+                    rvKelas.visibility  = View.GONE
+                    return@addSnapshotListener
+                }
+
                 tvEmpty.visibility = View.GONE
+                rvKelas.visibility = View.VISIBLE
+
+                // Untuk setiap kelas, hitung jumlah murid realtime
                 var loaded = 0
                 docs.forEach { doc ->
                     val kelasId = doc.id
-                    // Hitung murid secara realtime dari collection users
                     db.collection("users")
                         .whereEqualTo("kelasId", kelasId)
                         .get()
@@ -118,20 +125,30 @@ setupBackButton()
                             ))
                             loaded++
                             if (loaded == docs.size) {
+                                // Sort berdasarkan namaKelas agar urutan konsisten
+                                kelasList.sortBy { it.namaKelas }
                                 adapter.notifyDataSetChanged()
                             }
+                        }
+                        .addOnFailureListener {
+                            kelasList.add(KelasModel(
+                                kelasId   = kelasId,
+                                namaKelas = doc.getString("namaKelas") ?: "",
+                                kodeKelas = doc.getString("kodeKelas") ?: "",
+                                jumlahMurid = 0L
+                            ))
+                            loaded++
+                            if (loaded == docs.size) adapter.notifyDataSetChanged()
                         }
                 }
             }
     }
-
 
     private fun showDialogBuatKelas() {
         val etNamaKelas = EditText(this).apply {
             hint = "Nama kelas, contoh: XI RPL 1"
             setPadding(40, 20, 40, 20)
         }
-
         AlertDialog.Builder(this)
             .setTitle("Buat Kelas Baru")
             .setView(etNamaKelas)
@@ -145,48 +162,35 @@ setupBackButton()
     }
 
     private fun buatKelas(namaKelas: String) {
-        // Kode Kelas 6 digit
         val kodeKelas = generateKodeKelas()
-
-        val kelasData = hashMapOf(
+        db.collection("kelas").add(hashMapOf(
             "namaKelas"   to namaKelas,
             "kodeKelas"   to kodeKelas,
             "guruUid"     to session.getUid(),
             "guruNama"    to session.getNama(),
             "jumlahMurid" to 0L,
             "createdAt"   to FieldValue.serverTimestamp()
-        )
-
-        db.collection("kelas").add(kelasData)
-            .addOnSuccessListener {
-                Toast.makeText(this,
-                    "Kelas '$namaKelas' berhasil dibuat! Kode: $kodeKelas",
-                    Toast.LENGTH_LONG).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Gagal buat kelas: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
+        )).addOnSuccessListener {
+            Toast.makeText(this, "Kelas '$namaKelas' dibuat!\nKode: $kodeKelas", Toast.LENGTH_LONG).show()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Gagal buat kelas: ${it.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    /**
-     * Generate kode 6 karakter unik dari huruf kapital + angka.
-     * Contoh: A3F7K2, BX92LM
-     * Kecil kemungkinan bentrok karena ada 36^6 = 2 miliar kombinasi.
-     */
+    /** Kode 6 karakter: huruf kapital + angka, hindari 0/O/1/I agar tidak membingungkan */
     private fun generateKodeKelas(): String {
-        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // hindari 0,O,1,I agar tidak membingungkan
+        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         return (1..6).map { chars.random() }.joinToString("")
     }
 
     private fun showDialogHapusKelas(kelas: KelasModel) {
         AlertDialog.Builder(this)
             .setTitle("Hapus Kelas")
-            .setMessage("Yakin ingin menghapus kelas '${kelas.namaKelas}'?\nSemua murid di kelas ini akan otomatis keluar.")
+            .setMessage("Yakin hapus kelas '${kelas.namaKelas}'?\nSemua murid akan otomatis keluar.")
             .setPositiveButton("Hapus") { _, _ ->
-                db.collection("kelas").document(kelas.kelasId)
-                    .delete()
+                db.collection("kelas").document(kelas.kelasId).delete()
                     .addOnSuccessListener {
-                        // Reset kelasId semua murid yang ada di kelas ini
+                        // Reset kelasId semua murid di kelas ini
                         db.collection("users")
                             .whereEqualTo("kelasId", kelas.kelasId)
                             .get()
@@ -203,16 +207,5 @@ setupBackButton()
             }
             .setNegativeButton("Batal", null)
             .show()
-    }
-
-    private fun hapusKelas(idKelas: String) {
-        db.collection("kelas").document(idKelas)
-            .delete()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Kelas berhasil dihapus", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Gagal menghapus: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
     }
 }

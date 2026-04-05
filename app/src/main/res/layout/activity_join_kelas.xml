@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="#FDE8E8">
 
+    <include layout="@layout/layout_arrow" />
     <!-- Header background (sama seperti OTP) -->
     <ImageView
         android:layout_width="match_parent"

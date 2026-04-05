@@ -1,11 +1,7 @@
 package com.example.e_ntog
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
@@ -20,7 +16,7 @@ data class ChatMessage(
     val timestamp: Timestamp? = null
 )
 
-class ChatActivity : AppCompatActivity() {
+class ChatActivity : BaseActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
@@ -31,29 +27,33 @@ class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
+        setupBackButton()
 
         session = SessionManager(this)
 
         val otherUid  = intent.getStringExtra("OTHER_UID")  ?: ""
-        val otherNama = intent.getStringExtra("OTHER_NAMA") ?: "Guru"
+        val otherNama = intent.getStringExtra("OTHER_NAMA") ?: "Pengguna"
 
-        val tvTitle   = findViewById<TextView>(R.id.tv_chat_title)
-        val rvChat    = findViewById<RecyclerView>(R.id.rv_chat)
-        val etPesan   = findViewById<EditText>(R.id.et_pesan_chat)
-        val btnKirim  = findViewById<ImageView>(R.id.iv_btn_kirim)
-        val ivBack    = findViewById<ImageView>(R.id.iv_back_chat)
+        val tvTitle  = findViewById<TextView>(R.id.tv_chat_title)
+        val rvChat   = findViewById<RecyclerView>(R.id.rv_chat)
+        val etPesan  = findViewById<EditText>(R.id.et_pesan_chat)
+        val btnKirim = findViewById<ImageView>(R.id.iv_btn_kirim)
+        val ivBack   = findViewById<ImageView>(R.id.iv_back_chat)
 
         tvTitle.text = otherNama
         ivBack.setOnClickListener { finish() }
 
-        // Chat ID = gabungan 2 UID diurutkan secara leksikografis agar unik
         val myUid = session.getUid()
+
+        // Chat ID: gabungan 2 UID diurutkan leksikografis agar unik & konsisten
         chatId = if (myUid < otherUid) "${myUid}_${otherUid}" else "${otherUid}_${myUid}"
 
-        // Pastikan dokumen chat ada
+        // Buat/pastikan dokumen chat ada
         db.collection("chats").document(chatId)
-            .set(mapOf("participants" to listOf(myUid, otherUid)),
-                com.google.firebase.firestore.SetOptions.merge())
+            .set(
+                mapOf("participants" to listOf(myUid, otherUid)),
+                com.google.firebase.firestore.SetOptions.merge()
+            )
 
         // Setup RecyclerView
         adapter = ChatAdapter(messages, myUid)
@@ -64,7 +64,8 @@ class ChatActivity : AppCompatActivity() {
         db.collection("chats").document(chatId)
             .collection("messages")
             .orderBy("timestamp", Query.Direction.ASCENDING)
-            .addSnapshotListener { snaps, _ ->
+            .addSnapshotListener { snaps, error ->
+                if (error != null) return@addSnapshotListener
                 messages.clear()
                 snaps?.forEach { doc ->
                     messages.add(ChatMessage(
@@ -75,7 +76,9 @@ class ChatActivity : AppCompatActivity() {
                     ))
                 }
                 adapter.notifyDataSetChanged()
-                if (messages.isNotEmpty()) rvChat.scrollToPosition(messages.size - 1)
+                if (messages.isNotEmpty()) {
+                    rvChat.scrollToPosition(messages.size - 1)
+                }
             }
 
         // Kirim pesan
@@ -83,13 +86,18 @@ class ChatActivity : AppCompatActivity() {
             val text = etPesan.text.toString().trim()
             if (text.isEmpty()) return@setOnClickListener
             etPesan.setText("")
-            val msg = hashMapOf(
-                "senderId"   to myUid,
-                "senderNama" to session.getNama(),
-                "text"       to text,
-                "timestamp"  to FieldValue.serverTimestamp()
-            )
-            db.collection("chats").document(chatId).collection("messages").add(msg)
+
+            db.collection("chats").document(chatId)
+                .collection("messages")
+                .add(hashMapOf(
+                    "senderId"   to myUid,
+                    "senderNama" to session.getNama(),
+                    "text"       to text,
+                    "timestamp"  to FieldValue.serverTimestamp()
+                ))
+                .addOnFailureListener {
+                    Toast.makeText(this, "Gagal kirim: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 }

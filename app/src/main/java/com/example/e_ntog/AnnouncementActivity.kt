@@ -2,9 +2,8 @@ package com.example.e_ntog
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Timestamp
@@ -20,7 +19,7 @@ data class AnnouncementModel(
     val timestamp: Timestamp? = null
 )
 
-class AnnouncementActivity : AppCompatActivity() {
+class AnnouncementActivity : BaseActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
@@ -31,13 +30,15 @@ class AnnouncementActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_announcement)
+        setupBackButton()
 
         session = SessionManager(this)
 
-        val rvAnno    = findViewById<RecyclerView>(R.id.rv_announcement)
-        val fabKirim  = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fab_kirim_announcement)
-        val ivBack    = findViewById<ImageView>(R.id.iv_back_anno)
-        val tvEmpty   = findViewById<TextView>(R.id.tv_anno_empty)
+        val rvAnno   = findViewById<RecyclerView>(R.id.rv_announcement)
+        val fabKirim = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(
+            R.id.fab_kirim_announcement)
+        val ivBack   = findViewById<ImageView>(R.id.iv_back_anno)
+        val tvEmpty  = findViewById<TextView>(R.id.tv_anno_empty)
 
         ivBack.setOnClickListener { finish() }
 
@@ -49,16 +50,19 @@ class AnnouncementActivity : AppCompatActivity() {
         rvAnno.layoutManager = LinearLayoutManager(this)
         rvAnno.adapter = adapter
 
-        // Ambil kelasId dari user
+        // Ambil kelasId dari Firestore
         db.collection("users").document(session.getUid()).get()
             .addOnSuccessListener { doc ->
                 kelasId = doc.getString("kelasId") ?: ""
                 if (kelasId.isEmpty()) {
-                    tvEmpty.text = "Belum join kelas"
+                    tvEmpty.text       = "Belum join kelas"
                     tvEmpty.visibility = View.VISIBLE
                     return@addOnSuccessListener
                 }
                 loadAnnouncements(tvEmpty)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal load data: ${it.message}", Toast.LENGTH_SHORT).show()
             }
 
         fabKirim.setOnClickListener { showDialogKirimAnnouncement() }
@@ -68,15 +72,19 @@ class AnnouncementActivity : AppCompatActivity() {
         db.collection("kelas").document(kelasId)
             .collection("announcements")
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snaps, _ ->
+            .addSnapshotListener { snaps, error ->
+                if (error != null) {
+                    Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
                 annoList.clear()
                 snaps?.forEach { doc ->
                     annoList.add(AnnouncementModel(
-                        id       = doc.id,
-                        title    = doc.getString("title")    ?: "",
-                        content  = doc.getString("content")  ?: "",
-                        guruNama = doc.getString("guruNama") ?: "",
-                        timestamp= doc.getTimestamp("timestamp")
+                        id        = doc.id,
+                        title     = doc.getString("title")    ?: "",
+                        content   = doc.getString("content")  ?: "",
+                        guruNama  = doc.getString("guruNama") ?: "",
+                        timestamp = doc.getTimestamp("timestamp")
                     ))
                 }
                 adapter.notifyDataSetChanged()
@@ -85,7 +93,12 @@ class AnnouncementActivity : AppCompatActivity() {
     }
 
     private fun showDialogKirimAnnouncement() {
-        val view = layoutInflater.inflate(R.layout.dialog_kirim_announcement, null)
+        if (kelasId.isEmpty()) {
+            Toast.makeText(this, "Belum join kelas", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val view      = layoutInflater.inflate(R.layout.dialog_kirim_announcement, null)
         val etTitle   = view.findViewById<EditText>(R.id.et_anno_title)
         val etContent = view.findViewById<EditText>(R.id.et_anno_content)
 
@@ -110,6 +123,9 @@ class AnnouncementActivity : AppCompatActivity() {
                     ))
                     .addOnSuccessListener {
                         Toast.makeText(this, "Pengumuman terkirim!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Gagal: ${it.message}", Toast.LENGTH_SHORT).show()
                     }
             }
             .setNegativeButton("Batal", null)

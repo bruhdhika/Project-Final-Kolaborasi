@@ -11,12 +11,12 @@ class MuridKelasAdapter(
 ) : RecyclerView.Adapter<MuridKelasAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val cardMurid:     MaterialCardView = view.findViewById(R.id.card_murid)
-        val tvNama:        TextView         = view.findViewById(R.id.tv_murid_nama)
-        val tvKelas:       TextView         = view.findViewById(R.id.tv_murid_kelas)
-        val tvStatTerlambat: TextView       = view.findViewById(R.id.tv_stat_terlambat)
-        val tvStatAbsen:   TextView         = view.findViewById(R.id.tv_stat_absen)
-        val tvStatDispen:  TextView         = view.findViewById(R.id.tv_stat_dispen)
+        val cardMurid:       MaterialCardView = view.findViewById(R.id.card_murid)
+        val tvNama:          TextView         = view.findViewById(R.id.tv_murid_nama)
+        val tvKelas:         TextView         = view.findViewById(R.id.tv_murid_kelas)
+        val tvStatTerlambat: TextView         = view.findViewById(R.id.tv_stat_terlambat)
+        val tvStatAbsen:     TextView         = view.findViewById(R.id.tv_stat_absen)
+        val tvStatDispen:    TextView         = view.findViewById(R.id.tv_stat_dispen)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

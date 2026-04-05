@@ -31,7 +31,7 @@ class KelasAdapter(
         holder.tvNamaKelas.text   = kelas.namaKelas
         holder.tvKodeKelas.text   = "Kode: ${kelas.kodeKelas}"
         holder.tvJumlahMurid.text = "${kelas.jumlahMurid} murid terdaftar"
-        holder.cardKelas.setOnClickListener  { onKelasClick(kelas) }
+        holder.cardKelas.setOnClickListener    { onKelasClick(kelas) }
         holder.btnHapusKelas.setOnClickListener { onDeleteClick(kelas) }
     }
 

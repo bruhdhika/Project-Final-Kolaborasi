@@ -4,8 +4,9 @@ import android.view.*
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class AnnouncementAdapter(private val list: List<AnnouncementModel>)
-    : RecyclerView.Adapter<AnnouncementAdapter.ViewHolder>() {
+class AnnouncementAdapter(
+    private val list: List<AnnouncementModel>
+) : RecyclerView.Adapter<AnnouncementAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvTitle:   TextView = view.findViewById(R.id.tv_anno_title)
@@ -14,7 +15,9 @@ class AnnouncementAdapter(private val list: List<AnnouncementModel>)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.item_announcement, parent, false))
+        LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_announcement, parent, false)
+    )
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val anno = list[position]
