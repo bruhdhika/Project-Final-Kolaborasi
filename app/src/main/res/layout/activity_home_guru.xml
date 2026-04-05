@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- activity_home_guru.xml — pakai menu_drawer_GURU -->
 <androidx.drawerlayout.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Header gambar -->
         <ImageView
             android:id="@+id/iv_header"
             android:layout_width="0dp"
@@ -23,7 +23,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Icon hamburger menu -->
         <ImageView
             android:id="@+id/iv_header_icon"
             android:layout_width="30dp"
@@ -34,7 +33,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Badge GURU -->
         <TextView
             android:id="@+id/tv_badge_guru"
             android:layout_width="wrap_content"
@@ -51,7 +49,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Sapaan guru -->
         <TextView
             android:id="@+id/tv_guru_greeting"
             android:layout_width="0dp"
@@ -80,8 +77,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_guru_greeting" />
 
-        <!-- Area putih melengkung -->
-        <!-- Gunakan NestedScrollView agar RecyclerView bisa scroll di dalamnya -->
+        <!-- NestedScrollView agar RV bisa scroll di dalam -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -108,7 +104,6 @@
                     android:textColor="#212121"
                     android:layout_marginBottom="16dp" />
 
-                <!-- Empty state -->
                 <TextView
                     android:id="@+id/tv_empty_kelas"
                     android:layout_width="match_parent"
@@ -120,7 +115,6 @@
                     android:visibility="gone"
                     android:paddingVertical="40dp" />
 
-                <!-- RecyclerView list kelas — nestedScrollingEnabled false agar tidak konflik -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_kelas"
                     android:layout_width="match_parent"
@@ -131,7 +125,6 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <!-- FAB Tambah Kelas -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_tambah_kelas"
             android:layout_width="wrap_content"
@@ -144,7 +137,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
-        <!-- layout_arrow (fabNext back button) -->
         <include
             layout="@layout/layout_arrow"
             android:layout_width="wrap_content"
@@ -154,12 +146,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Drawer navigation -->
+    <!-- Drawer pakai menu GURU -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        app:menu="@menu/menu_drawer" />
+        app:menu="@menu/menu_drawer_guru" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

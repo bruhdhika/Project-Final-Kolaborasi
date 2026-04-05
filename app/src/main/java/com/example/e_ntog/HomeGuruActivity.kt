@@ -47,7 +47,6 @@ class HomeGuruActivity : BaseActivity() {
 
         tvGreeting.text = "Halo, ${session.getNama()}"
 
-        // ── Setup RecyclerView ──────────────────────────────────────────────
         adapter = KelasAdapter(
             kelasList,
             onKelasClick = { kelas ->
@@ -62,13 +61,16 @@ class HomeGuruActivity : BaseActivity() {
         rvKelas.layoutManager = LinearLayoutManager(this)
         rvKelas.adapter = adapter
 
-        // ── Drawer ─────────────────────────────────────────────────────────
         ivMenuIcon.setOnClickListener { drawerLayout.openDrawer(GravityCompat.END) }
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_profile      -> startActivity(Intent(this, ProfileActivity::class.java))
                 R.id.nav_chat_forum   -> startActivity(Intent(this, ForumKelasActivity::class.java))
                 R.id.nav_announcement -> startActivity(Intent(this, AnnouncementActivity::class.java))
+                // Guru juga bisa ajukan izin untuk dirinya sendiri
+                R.id.nav_terlambat    -> startActivity(Intent(this, TerlambatActivity::class.java))
+                R.id.nav_dispen       -> startActivity(Intent(this, DispensasiActivity::class.java))
+                R.id.nav_tidak_hadir  -> startActivity(Intent(this, TidakHadirActivity::class.java))
                 R.id.nav_logout       -> {
                     auth.signOut(); session.clearSession()
                     startActivity(Intent(this, LoginActivity::class.java).apply {
@@ -80,8 +82,6 @@ class HomeGuruActivity : BaseActivity() {
         }
 
         fabTambah.setOnClickListener { showDialogBuatKelas() }
-
-        // ── Load kelas realtime ─────────────────────────────────────────────
         loadKelasList(tvEmpty, rvKelas)
     }
 
@@ -90,33 +90,32 @@ class HomeGuruActivity : BaseActivity() {
             .whereEqualTo("guruUid", session.getUid())
             .addSnapshotListener { snaps, error ->
                 if (error != null) {
-                    Toast.makeText(this, "Error load kelas: ${error.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
-
                 val docs = snaps?.documents ?: emptyList()
                 kelasList.clear()
 
                 if (docs.isEmpty()) {
                     adapter.notifyDataSetChanged()
-                    tvEmpty.visibility  = View.VISIBLE
-                    rvKelas.visibility  = View.GONE
+                    tvEmpty.visibility = View.VISIBLE
+                    rvKelas.visibility = View.GONE
                     return@addSnapshotListener
                 }
 
                 tvEmpty.visibility = View.GONE
                 rvKelas.visibility = View.VISIBLE
 
-                // Untuk setiap kelas, hitung jumlah murid realtime
                 var loaded = 0
                 docs.forEach { doc ->
                     val kelasId = doc.id
                     db.collection("users")
                         .whereEqualTo("kelasId", kelasId)
                         .get()
-                        .addOnSuccessListener { muridSnap ->
-                            val jumlah = muridSnap.documents
-                                .count { it.getString("role") == "murid" }
+                        .addOnCompleteListener { task ->
+                            val jumlah = if (task.isSuccessful) {
+                                task.result.documents.count { it.getString("role") == "murid" }
+                            } else 0
                             kelasList.add(KelasModel(
                                 kelasId     = kelasId,
                                 namaKelas   = doc.getString("namaKelas") ?: "",
@@ -125,20 +124,9 @@ class HomeGuruActivity : BaseActivity() {
                             ))
                             loaded++
                             if (loaded == docs.size) {
-                                // Sort berdasarkan namaKelas agar urutan konsisten
                                 kelasList.sortBy { it.namaKelas }
                                 adapter.notifyDataSetChanged()
                             }
-                        }
-                        .addOnFailureListener {
-                            kelasList.add(KelasModel(
-                                kelasId   = kelasId,
-                                namaKelas = doc.getString("namaKelas") ?: "",
-                                kodeKelas = doc.getString("kodeKelas") ?: "",
-                                jumlahMurid = 0L
-                            ))
-                            loaded++
-                            if (loaded == docs.size) adapter.notifyDataSetChanged()
                         }
                 }
             }
@@ -162,7 +150,7 @@ class HomeGuruActivity : BaseActivity() {
     }
 
     private fun buatKelas(namaKelas: String) {
-        val kodeKelas = generateKodeKelas()
+        val kodeKelas = (1..6).map { "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".random() }.joinToString("")
         db.collection("kelas").add(hashMapOf(
             "namaKelas"   to namaKelas,
             "kodeKelas"   to kodeKelas,
@@ -173,14 +161,8 @@ class HomeGuruActivity : BaseActivity() {
         )).addOnSuccessListener {
             Toast.makeText(this, "Kelas '$namaKelas' dibuat!\nKode: $kodeKelas", Toast.LENGTH_LONG).show()
         }.addOnFailureListener {
-            Toast.makeText(this, "Gagal buat kelas: ${it.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Gagal: ${it.message}", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    /** Kode 6 karakter: huruf kapital + angka, hindari 0/O/1/I agar tidak membingungkan */
-    private fun generateKodeKelas(): String {
-        val chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-        return (1..6).map { chars.random() }.joinToString("")
     }
 
     private fun showDialogHapusKelas(kelas: KelasModel) {
@@ -190,16 +172,13 @@ class HomeGuruActivity : BaseActivity() {
             .setPositiveButton("Hapus") { _, _ ->
                 db.collection("kelas").document(kelas.kelasId).delete()
                     .addOnSuccessListener {
-                        // Reset kelasId semua murid di kelas ini
-                        db.collection("users")
-                            .whereEqualTo("kelasId", kelas.kelasId)
-                            .get()
+                        db.collection("users").whereEqualTo("kelasId", kelas.kelasId).get()
                             .addOnSuccessListener { snaps ->
                                 snaps.forEach { doc ->
                                     doc.reference.update("kelasId", "", "kelasNama", "")
                                 }
                             }
-                        Toast.makeText(this, "Kelas '${kelas.namaKelas}' dihapus.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Kelas dihapus.", Toast.LENGTH_SHORT).show()
                     }
                     .addOnFailureListener {
                         Toast.makeText(this, "Gagal hapus: ${it.message}", Toast.LENGTH_SHORT).show()

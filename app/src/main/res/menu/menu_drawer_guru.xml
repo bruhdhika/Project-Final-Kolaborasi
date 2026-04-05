@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Menu Drawer MURID — res/menu/menu_drawer.xml -->
+<!-- Menu Drawer GURU — res/menu/menu_drawer_guru.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
@@ -16,6 +16,21 @@
         android:id="@+id/nav_announcement"
         android:title="Pengumuman"
         android:icon="@android:drawable/ic_dialog_info" />
+
+    <item
+        android:id="@+id/nav_terlambat"
+        android:title="Izin Terlambat (Pribadi)"
+        android:icon="@drawable/running" />
+
+    <item
+        android:id="@+id/nav_dispen"
+        android:title="Dispensasi (Pribadi)"
+        android:icon="@drawable/ijindispen" />
+
+    <item
+        android:id="@+id/nav_tidak_hadir"
+        android:title="Tidak Hadir (Pribadi)"
+        android:icon="@drawable/where" />
 
     <item
         android:id="@+id/nav_logout"

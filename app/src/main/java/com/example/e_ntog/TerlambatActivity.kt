@@ -3,10 +3,10 @@ package com.example.e_ntog
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.firebase.Timestamp
@@ -28,85 +28,110 @@ class TerlambatActivity : BaseActivity() {
     private lateinit var clSearchWali: ConstraintLayout
     private lateinit var btnSubmit: AppCompatButton
 
+    // Simpan kelasId murid untuk kirim pesan sistem ke forum
+    private var muridKelasId = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_terlambat)
         setupBackButton()
         session = SessionManager(this)
-        loadKelasSpinner() // TAMBAHAN: Panggil di sini
 
-        etNama      = findViewById(R.id.et_nama)
-        spinnerKelas= findViewById(R.id.spinner_kelas)
-        etAlasan    = findViewById(R.id.et_alasan)
-        etWaliKelas = findViewById(R.id.et_wali_kelas)
-        clSearchWali= findViewById(R.id.cl_search_wali)
-        btnSubmit   = findViewById(R.id.btn_submit)
+        etNama       = findViewById(R.id.et_nama)
+        spinnerKelas = findViewById(R.id.spinner_kelas)
+        etAlasan     = findViewById(R.id.et_alasan)
+        etWaliKelas  = findViewById(R.id.et_wali_kelas)
+        clSearchWali = findViewById(R.id.cl_search_wali)
+        btnSubmit    = findViewById(R.id.btn_submit)
 
-        // Isi nama otomatis dari session
         etNama.setText(session.getNama())
 
-        waliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
-                etWaliKelas.setText(namaWali)
-                clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
-                etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
-                etWaliKelas.setPadding(16, 0, 16, 0)
-            }
-        }
+        val isGuru = session.getRole() == SessionManager.ROLE_GURU
 
-        val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
-        clSearchWali.setOnClickListener { openWali() }
-        findViewById<ImageView>(R.id.iv_search_icon).setOnClickListener { openWali() }
+        if (isGuru) {
+            // ── GURU: sembunyikan field kelas & wali kelas ─────────────────
+            spinnerKelas.visibility = View.GONE
+            clSearchWali.visibility = View.GONE
+            findViewById<View?>(R.id.tv_label_kelas)?.visibility    = View.GONE
+            findViewById<View?>(R.id.tv_label_wali)?.visibility     = View.GONE
+            // Set nilai default
+            muridKelasId = ""
+        } else {
+            // ── MURID: tampilkan kelas & wali, load dari Firestore ─────────
+            spinnerKelas.visibility = View.VISIBLE
+            clSearchWali.visibility = View.VISIBLE
+
+            loadKelasSpinner()
+
+            waliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
+                    etWaliKelas.setText(namaWali)
+                    clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
+                    etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
+                    etWaliKelas.setPadding(16, 0, 16, 0)
+                }
+            }
+            val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
+            clSearchWali.setOnClickListener { openWali() }
+            findViewById<ImageView>(R.id.iv_search_icon).setOnClickListener { openWali() }
+        }
 
         btnSubmit.setOnClickListener {
             val nama   = etNama.text.toString().trim()
-            val kelas  = spinnerKelas.selectedItem.toString()
             val alasan = etAlasan.text.toString().trim()
-            val wali   = etWaliKelas.text.toString().trim()
-
-            // Validasi
             if (nama.isEmpty())   { etNama.error = "Nama wajib diisi";   return@setOnClickListener }
-
-            // PERUBAHAN: Validasi kelas kosong
-            if (kelas.isEmpty() || kelas == "Belum join kelas") {
-                Toast.makeText(this, "Kamu belum join kelas", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
             if (alasan.isEmpty()) { etAlasan.error = "Alasan wajib diisi"; return@setOnClickListener }
-            if (wali.isEmpty())   {
-                Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+
+            val kelas: String
+            val wali: String
+
+            if (isGuru) {
+                kelas = "Guru"
+                wali  = "-"
+            } else {
+                kelas = spinnerKelas.selectedItem?.toString() ?: ""
+                wali  = etWaliKelas.text.toString().trim()
+                if (kelas.isEmpty() || kelas == "Belum join kelas") {
+                    Toast.makeText(this, "Kamu belum join kelas", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (wali.isEmpty()) {
+                    Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
             }
 
             btnSubmit.isEnabled = false
+            val uid     = session.getUid()
+            val tanggal = SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(Date())
 
-            val uid       = session.getUid()
-            val now       = Timestamp.now()
-            val tanggal   = SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(Date())
-
-            // Simpan history ke sub-collection
             val historyData = hashMapOf(
-                "nama"       to nama,
-                "kelas"      to kelas,
-                "alasan"     to alasan,
-                "waliKelas"  to wali,
-                "tanggal"    to tanggal,
-                "timestamp"  to now,
-                "status"     to "pending"
+                "nama"      to nama,
+                "kelas"     to kelas,
+                "alasan"    to alasan,
+                "waliKelas" to wali,
+                "tanggal"   to tanggal,
+                "timestamp" to Timestamp.now(),
+                "status"    to "pending"
             )
 
             db.collection("users").document(uid)
                 .collection("history_terlambat")
                 .add(historyData)
                 .addOnSuccessListener {
-                    // Update counter di dokumen utama (increment atomik)
                     db.collection("users").document(uid)
                         .update("totalTerlambat", FieldValue.increment(1))
 
+                    // Kirim pesan sistem ke forum kelas (hanya untuk murid yang sudah join kelas)
+                    if (!isGuru && muridKelasId.isNotEmpty()) {
+                        ForumKelasActivity.kirimPesanSistem(
+                            db, muridKelasId,
+                            "📋 $nama mengajukan izin TERLAMBAT pada $tanggal. Alasan: $alasan"
+                        )
+                    }
+
                     btnSubmit.isEnabled = true
-                    // Kirim ke StrukActivity
                     startActivity(Intent(this, StrukActivity::class.java).apply {
                         putExtra("NAMA", nama)
                         putExtra("KELAS", kelas)
@@ -123,36 +148,25 @@ class TerlambatActivity : BaseActivity() {
         }
     }
 
-    // TAMBAHAN: Fungsi loadKelasSpinner
     private fun loadKelasSpinner() {
-        val uid = session.getUid()
-
-        // Ambil kelasId murid dari Firestore
-        db.collection("users").document(uid).get()
+        db.collection("users").document(session.getUid()).get()
             .addOnSuccessListener { userDoc ->
-                val kelasId = userDoc.getString("kelasId") ?: ""
+                val kelasId   = userDoc.getString("kelasId")   ?: ""
                 val kelasNama = userDoc.getString("kelasNama") ?: ""
+                muridKelasId  = kelasId
 
                 if (kelasId.isEmpty()) {
-                    // Murid belum join kelas → spinner hanya 1 item
-                    val adapter = ArrayAdapter(this,
-                        android.R.layout.simple_spinner_item,
-                        listOf("Belum join kelas"))
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    spinnerKelas.adapter = adapter
+                    spinnerKelas.adapter = ArrayAdapter(this,
+                        android.R.layout.simple_spinner_item, listOf("Belum join kelas"))
+                        .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
                     return@addOnSuccessListener
                 }
-
-                // Ambil nama kelas dari collection 'kelas'
                 db.collection("kelas").document(kelasId).get()
                     .addOnSuccessListener { kelasDoc ->
-                        val namaKelas = kelasDoc.getString("namaKelas") ?: kelasNama
-                        val items = listOf(namaKelas)
-                        val adapter = ArrayAdapter(this,
-                            android.R.layout.simple_spinner_item, items)
-                        adapter.setDropDownViewResource(
-                            android.R.layout.simple_spinner_dropdown_item)
-                        spinnerKelas.adapter = adapter
+                        val nama = kelasDoc.getString("namaKelas") ?: kelasNama
+                        spinnerKelas.adapter = ArrayAdapter(this,
+                            android.R.layout.simple_spinner_item, listOf(nama))
+                            .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
                     }
             }
     }

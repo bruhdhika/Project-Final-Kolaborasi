@@ -5,6 +5,22 @@
     android:orientation="vertical"
     android:padding="20dp">
 
+    <!-- Spinner pilih kelas (hanya tampil untuk guru, dikontrol secara programatik) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kirim ke Kelas:"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginBottom="6dp" />
+
+    <Spinner
+        android:id="@+id/spinner_kelas_announcement"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_edittext_grey"
+        android:layout_marginBottom="14dp" />
+
     <EditText
         android:id="@+id/et_anno_title"
         android:layout_width="match_parent"
@@ -24,4 +40,5 @@
         android:minLines="3"
         android:padding="10dp"
         android:background="@drawable/bg_edittext_grey" />
+
 </LinearLayout>

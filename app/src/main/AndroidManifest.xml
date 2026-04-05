@@ -18,9 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Entog">
 
-        <activity
-            android:name=".LoginActivity"
-            android:exported="true">
+        <activity android:name=".LoginActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -48,10 +46,6 @@
         <activity android:name=".ChatActivity"         android:exported="false" />
         <activity android:name=".ForumKelasActivity"   android:exported="false" />
         <activity android:name=".AnnouncementActivity" android:exported="false" />
-        <activity android:name=".MainActivity"         android:exported="false" />
-
-        <!-- DIHAPUS dari versi lama (bukan Activity):
-             .WaliKelasAdapter, .activity_home_guru, .AnnouncementAdapter, .ChatAdapter, .BaseActivity -->
 
     </application>
 
