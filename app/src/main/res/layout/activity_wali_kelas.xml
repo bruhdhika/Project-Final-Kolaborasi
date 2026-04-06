@@ -9,10 +9,9 @@
     android:background="@android:color/white"
     tools:context=".WaliKelasActivity">
 
-    <!-- Header background — SAMA seperti sebelumnya -->
     <ImageView
         android:id="@+id/iv_header"
-        android:layout_width="1dp"
+        android:layout_width="match_parent"
         android:layout_height="180dp"
         android:scaleType="centerCrop"
         android:src="@drawable/matematika"
@@ -21,20 +20,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Tombol back — SAMA seperti sebelumnya -->
     <ImageView
         android:id="@+id/iv_back_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_arrow_back"
-        app:tint="@color/black"
+        app:tint="@color/white"
         android:padding="16dp"
         android:layout_marginTop="32dp"
         android:contentDescription="Tombol Kembali"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Judul — SAMA seperti sebelumnya -->
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
@@ -49,19 +46,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_header" />
 
-    <!-- Background putih melengkung — SAMA seperti sebelumnya -->
     <View
         android:id="@+id/view_white_bg"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/bg_white_curved_top"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="140dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Search bar — SAMA seperti sebelumnya, sekarang benar-benar berfungsi -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_search_bar"
         android:layout_width="0dp"
@@ -98,7 +93,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- ProgressBar: tampil saat loading data dari Firestore -->
     <ProgressBar
         android:id="@+id/pb_wali_loading"
         android:layout_width="wrap_content"
@@ -109,7 +103,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Empty state: tampil jika tidak ada guru terdaftar -->
     <TextView
         android:id="@+id/tv_wali_empty"
         android:layout_width="0dp"
@@ -125,7 +118,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- RecyclerView: list guru dinamis dari Firestore -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_wali_kelas"
         android:layout_width="0dp"
@@ -139,7 +131,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <include layout="@layout/layout_arrow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

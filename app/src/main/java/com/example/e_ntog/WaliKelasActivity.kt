@@ -34,10 +34,7 @@ class WaliKelasActivity : AppCompatActivity() {
 
         ivBack.setOnClickListener { finish() }
 
-        // Adapter: klik guru → kirim nama kembali ke pemanggil (TerlambatActivity, dll)
-        // DAN buka DetailWaliActivity
         adapter = WaliKelasAdapter(filteredGuruList) { guru ->
-            // Buka DetailWaliActivity untuk lihat detail & chat
             val intent = Intent(this, DetailWaliActivity::class.java)
             intent.putExtra("GURU_UID",   guru.uid)
             intent.putExtra("GURU_NAMA",  guru.nama)
@@ -45,6 +42,7 @@ class WaliKelasActivity : AppCompatActivity() {
             intent.putExtra("GURU_PHOTO", guru.photoUrl)
             startActivityForResult(intent, REQUEST_DETAIL_WALI)
         }
+
         rvWali.layoutManager = LinearLayoutManager(this)
         rvWali.adapter = adapter
 
@@ -59,10 +57,6 @@ class WaliKelasActivity : AppCompatActivity() {
         loadGuruDariKelas(progressBar, rvWali, tvEmpty)
     }
 
-    /**
-     * Load HANYA guru yang mengelola kelas murid ini.
-     * Alur: users/{uid}.kelasId → kelas/{kelasId}.guruUid → users/{guruUid}
-     */
     private fun loadGuruDariKelas(pb: ProgressBar, rv: RecyclerView, tvEmpty: TextView) {
         pb.visibility      = View.VISIBLE
         rv.visibility      = View.GONE
@@ -70,67 +64,66 @@ class WaliKelasActivity : AppCompatActivity() {
 
         val uid = session.getUid()
 
-        // Step 1: ambil kelasId murid
+        // 1. Ambil data user (murid)
         db.collection("users").document(uid).get()
             .addOnSuccessListener { userDoc ->
                 val kelasId = userDoc.getString("kelasId") ?: ""
                 if (kelasId.isEmpty()) {
-                    pb.visibility      = View.GONE
-                    tvEmpty.text       = "Kamu belum join kelas. Join kelas dulu!"
-                    tvEmpty.visibility = View.VISIBLE
+                    showError(pb, tvEmpty, "Kamu belum join kelas.")
                     return@addOnSuccessListener
                 }
 
-                // Step 2: ambil guruUid dari kelas
+                // 2. Ambil data kelas untuk mencari guruUid (admin kelas)
                 db.collection("kelas").document(kelasId).get()
                     .addOnSuccessListener { kelasDoc ->
                         val guruUid   = kelasDoc.getString("guruUid")   ?: ""
-                        val namaKelas = kelasDoc.getString("namaKelas") ?: ""
+                        val namaKelas = kelasDoc.getString("namaKelas") ?: "Kelas"
+
                         if (guruUid.isEmpty()) {
-                            pb.visibility      = View.GONE
-                            tvEmpty.text       = "Guru kelas belum terdaftar."
-                            tvEmpty.visibility = View.VISIBLE
+                            showError(pb, tvEmpty, "Wali kelas belum ditentukan.")
                             return@addOnSuccessListener
                         }
 
-                        // Step 3: ambil profil guru
+                        // 3. Ambil profil guru secara spesifik
                         db.collection("users").document(guruUid).get()
                             .addOnSuccessListener { guruDoc ->
                                 pb.visibility = View.GONE
                                 allGuruList.clear()
+
+                                // Menambahkan hanya 1 wali kelas hasil filter sistem
                                 allGuruList.add(WaliKelasModel(
                                     uid       = guruUid,
-                                    nama      = guruDoc.getString("nama")     ?: "-",
+                                    nama      = guruDoc.getString("nama")     ?: "Guru",
                                     namaKelas = namaKelas,
                                     photoUrl  = guruDoc.getString("photoUrl") ?: ""
                                 ))
+
                                 filteredGuruList.clear()
                                 filteredGuruList.addAll(allGuruList)
                                 adapter.notifyDataSetChanged()
                                 rv.visibility = View.VISIBLE
                             }
                             .addOnFailureListener {
-                                pb.visibility      = View.GONE
-                                tvEmpty.text       = "Gagal load guru: ${it.message}"
-                                tvEmpty.visibility = View.VISIBLE
+                                showError(pb, tvEmpty, "Gagal memuat profil guru.")
                             }
                     }
                     .addOnFailureListener {
-                        pb.visibility      = View.GONE
-                        tvEmpty.text       = "Gagal load kelas: ${it.message}"
-                        tvEmpty.visibility = View.VISIBLE
+                        showError(pb, tvEmpty, "Gagal memuat data kelas.")
                     }
             }
             .addOnFailureListener {
-                pb.visibility      = View.GONE
-                tvEmpty.text       = "Gagal: ${it.message}"
-                tvEmpty.visibility = View.VISIBLE
+                showError(pb, tvEmpty, "Gagal memuat data user.")
             }
+    }
+
+    private fun showError(pb: ProgressBar, tv: TextView, msg: String) {
+        pb.visibility = View.GONE
+        tv.text = msg
+        tv.visibility = View.VISIBLE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // DetailWaliActivity mengembalikan NAMA_WALI_TERPILIH → teruskan ke TerlambatActivity, dll
         if (requestCode == REQUEST_DETAIL_WALI && resultCode == Activity.RESULT_OK) {
             val namaWali = data?.getStringExtra("NAMA_WALI_TERPILIH") ?: ""
             setResult(Activity.RESULT_OK, Intent().apply {
