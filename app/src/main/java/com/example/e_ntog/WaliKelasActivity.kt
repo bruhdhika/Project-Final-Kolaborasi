@@ -1,157 +1,78 @@
 package com.example.e_ntog
 
-import android.app.Activity
+import android.annotation.SuppressLint
+import android.app.Activity // <-- IMPORT INI
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher // <-- IMPORT INI
+import androidx.activity.result.contract.ActivityResultContracts // <-- IMPORT INI
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.FirebaseFirestore
 
-class WaliKelasActivity : AppCompatActivity() {
+class WaliKelasActivity : BaseActivity() {
 
-    private val db = FirebaseFirestore.getInstance()
-    private val allGuruList      = mutableListOf<WaliKelasModel>()
-    private val filteredGuruList = mutableListOf<WaliKelasModel>()
-    private lateinit var adapter: WaliKelasAdapter
-    private lateinit var session: SessionManager
+    // Definisikan 'Launcher' untuk menerima hasil
+    private lateinit var detailWaliLauncher: ActivityResultLauncher<Intent>
 
+    @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wali_kelas)
 
-        session = SessionManager(this)
+setupBackButton()
+        detailWaliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
-        val ivBack      = findViewById<ImageView>(R.id.iv_back_arrow)
-        val etSearch    = findViewById<EditText>(R.id.et_search_wali)
-        val progressBar = findViewById<ProgressBar>(R.id.pb_wali_loading)
-        val rvWali      = findViewById<RecyclerView>(R.id.rv_wali_kelas)
-        val tvEmpty     = findViewById<TextView>(R.id.tv_wali_empty)
+            if (result.resultCode == Activity.RESULT_OK) {
 
-        ivBack.setOnClickListener { finish() }
+                val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
 
-        // Adapter: klik guru → kirim nama kembali ke pemanggil (TerlambatActivity, dll)
-        // DAN buka DetailWaliActivity
-        adapter = WaliKelasAdapter(filteredGuruList) { guru ->
-            // Buka DetailWaliActivity untuk lihat detail & chat
-            val intent = Intent(this, DetailWaliActivity::class.java)
-            intent.putExtra("GURU_UID",   guru.uid)
-            intent.putExtra("GURU_NAMA",  guru.nama)
-            intent.putExtra("GURU_KELAS", guru.namaKelas)
-            intent.putExtra("GURU_PHOTO", guru.photoUrl)
-            startActivityForResult(intent, REQUEST_DETAIL_WALI)
+
+                val resultIntent = Intent()
+                resultIntent.putExtra("NAMA_WALI_TERPILIH", namaWali)
+
+                // Kirim hasilnya...
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
+            }
+
         }
-        rvWali.layoutManager = LinearLayoutManager(this)
-        rvWali.adapter = adapter
 
-        etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                filterGuru(s.toString().trim(), rvWali, tvEmpty)
-            }
-        })
 
-        loadGuruDariKelas(progressBar, rvWali, tvEmpty)
-    }
-
-    /**
-     * Load HANYA guru yang mengelola kelas murid ini.
-     * Alur: users/{uid}.kelasId → kelas/{kelasId}.guruUid → users/{guruUid}
-     */
-    private fun loadGuruDariKelas(pb: ProgressBar, rv: RecyclerView, tvEmpty: TextView) {
-        pb.visibility      = View.VISIBLE
-        rv.visibility      = View.GONE
-        tvEmpty.visibility = View.GONE
-
-        val uid = session.getUid()
-
-        // Step 1: ambil kelasId murid
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { userDoc ->
-                val kelasId = userDoc.getString("kelasId") ?: ""
-                if (kelasId.isEmpty()) {
-                    pb.visibility      = View.GONE
-                    tvEmpty.text       = "Kamu belum join kelas. Join kelas dulu!"
-                    tvEmpty.visibility = View.VISIBLE
-                    return@addOnSuccessListener
-                }
-
-                // Step 2: ambil guruUid dari kelas
-                db.collection("kelas").document(kelasId).get()
-                    .addOnSuccessListener { kelasDoc ->
-                        val guruUid   = kelasDoc.getString("guruUid")   ?: ""
-                        val namaKelas = kelasDoc.getString("namaKelas") ?: ""
-                        if (guruUid.isEmpty()) {
-                            pb.visibility      = View.GONE
-                            tvEmpty.text       = "Guru kelas belum terdaftar."
-                            tvEmpty.visibility = View.VISIBLE
-                            return@addOnSuccessListener
-                        }
-
-                        // Step 3: ambil profil guru
-                        db.collection("users").document(guruUid).get()
-                            .addOnSuccessListener { guruDoc ->
-                                pb.visibility = View.GONE
-                                allGuruList.clear()
-                                allGuruList.add(WaliKelasModel(
-                                    uid       = guruUid,
-                                    nama      = guruDoc.getString("nama")     ?: "-",
-                                    namaKelas = namaKelas,
-                                    photoUrl  = guruDoc.getString("photoUrl") ?: ""
-                                ))
-                                filteredGuruList.clear()
-                                filteredGuruList.addAll(allGuruList)
-                                adapter.notifyDataSetChanged()
-                                rv.visibility = View.VISIBLE
-                            }
-                            .addOnFailureListener {
-                                pb.visibility      = View.GONE
-                                tvEmpty.text       = "Gagal load guru: ${it.message}"
-                                tvEmpty.visibility = View.VISIBLE
-                            }
-                    }
-                    .addOnFailureListener {
-                        pb.visibility      = View.GONE
-                        tvEmpty.text       = "Gagal load kelas: ${it.message}"
-                        tvEmpty.visibility = View.VISIBLE
-                    }
-            }
-            .addOnFailureListener {
-                pb.visibility      = View.GONE
-                tvEmpty.text       = "Gagal: ${it.message}"
-                tvEmpty.visibility = View.VISIBLE
-            }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // DetailWaliActivity mengembalikan NAMA_WALI_TERPILIH → teruskan ke TerlambatActivity, dll
-        if (requestCode == REQUEST_DETAIL_WALI && resultCode == Activity.RESULT_OK) {
-            val namaWali = data?.getStringExtra("NAMA_WALI_TERPILIH") ?: ""
-            setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra("NAMA_WALI_TERPILIH", namaWali)
-            })
+        // Temukan tombol back
+        val backButton = findViewById<ImageView>(R.id.iv_back_arrow)
+        backButton.setOnClickListener {
             finish()
         }
+
+        // Temukan semua card guru
+        val cardAgung = findViewById<ImageView>(R.id.card_Agung)
+        val cardEko = findViewById<ImageView>(R.id.card_Eko)
+        val cardAdi = findViewById<ImageView>(R.id.card_Adi)
+        val cardJaya = findViewById<ImageView>(R.id.card_Jaya)
+
+        // Beri listener (SEMUA MEMANGGIL FUNGSI 'pindahKeDetail')
+        cardAgung.setOnClickListener {
+            pindahKeDetail("Agung", "Kremes", R.drawable.kennan, "#F5F5F5")
+        }
+        cardEko.setOnClickListener {
+            pindahKeDetail("Eko", "Lontong", R.drawable.andika, "#FFCA28")
+        }
+        cardAdi.setOnClickListener {
+            pindahKeDetail("Adi", "Gemblong", R.drawable.moses, "#E53935")
+        }
+        cardJaya.setOnClickListener {
+            pindahKeDetail("Jaya", "Gehu", R.drawable.rasya, "#1E88E5")
+        }
     }
 
-    private fun filterGuru(keyword: String, rv: RecyclerView, tvEmpty: TextView) {
-        filteredGuruList.clear()
-        filteredGuruList.addAll(
-            if (keyword.isEmpty()) allGuruList
-            else allGuruList.filter { it.nama.contains(keyword, ignoreCase = true) }
-        )
-        adapter.notifyDataSetChanged()
-        tvEmpty.visibility = if (filteredGuruList.isEmpty()) View.VISIBLE else View.GONE
-        rv.visibility      = if (filteredGuruList.isEmpty()) View.GONE   else View.VISIBLE
-    }
+    private fun pindahKeDetail(namaDepan: String, namaBelakang: String, fotoResId: Int, warnaBg: String) {
+        val intent = Intent(this, DetailWaliActivity::class.java)
+        intent.putExtra("NAMA_DEPAN", namaDepan)
+        intent.putExtra("NAMA_BELAKANG", namaBelakang)
+        intent.putExtra("FOTO_ID", fotoResId)
+        intent.putExtra("WARNA_BG", warnaBg)
 
-    companion object {
-        const val REQUEST_DETAIL_WALI = 100
+        // JANGAN 'startActivity', TAPI 'launch' DENGAN LAUNCHER KITA
+        detailWaliLauncher.launch(intent)
     }
 }
