@@ -152,6 +152,6 @@ class WaliKelasActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val REQUEST_DETAIL_WALI = 100
+        const val REQUEST_DETAIL_WALI = 101
     }
 }
