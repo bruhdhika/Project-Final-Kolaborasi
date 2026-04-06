@@ -12,7 +12,7 @@
     <!-- Header background — SAMA seperti sebelumnya -->
     <ImageView
         android:id="@+id/iv_header"
-        android:layout_width="0dp"
+        android:layout_width="1dp"
         android:layout_height="180dp"
         android:scaleType="centerCrop"
         android:src="@drawable/matematika"
