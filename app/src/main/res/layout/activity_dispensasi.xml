@@ -103,6 +103,7 @@
 
             <!-- KELAS -->
             <TextView
+                android:id="@+id/tv_label_kelas"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kelas"
@@ -142,6 +143,7 @@
 
             <!-- WALI KELAS -->
             <TextView
+                android:id="@+id/tv_label_wali"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hubungi Wali Kelas"
