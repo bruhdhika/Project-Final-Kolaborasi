@@ -43,6 +43,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-appcheck-debug:17.1.2")
     // Glide — load gambar dari URL (foto profil)
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.activity)
