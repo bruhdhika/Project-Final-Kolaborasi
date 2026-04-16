@@ -5,5 +5,9 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.Entog" parent="Base.Theme.Entog" />
+    <style name="Theme.AppCompat.Entog" parent="Base.Theme.Entog" >
+        <item name="windowSplashScreenBackground">@color/splash_screen_bg</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/splash_icon_bg</item>
+
+    </style>
 </resources>

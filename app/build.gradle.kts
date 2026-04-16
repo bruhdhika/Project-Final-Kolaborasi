@@ -28,12 +28,18 @@ android {
 }
 
 dependencies {
+
+    //Splash
+    implementation("androidx.core:core-splashscreen:1.2.0")
+
     // AndroidX Core
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("io.coil-kt:coil-svg:2.6.0")
 
     // Circle Image View
     implementation("de.hdodenhof:circleimageview:3.1.0")
