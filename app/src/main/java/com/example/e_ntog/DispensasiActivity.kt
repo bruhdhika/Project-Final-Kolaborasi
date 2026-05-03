@@ -83,19 +83,16 @@ class DispensasiActivity : BaseActivity() {
             clSearchWali.setOnClickListener { openWali() }
             findViewById<ImageView>(R.id.iv_search_icon)
                 .setOnClickListener { openWali() }
+            etWaliKelas.setOnClickListener { openWali() }
         }
 
         btnSubmit.setOnClickListener {
             val nama   = etNama.text.toString().trim()
             val alasan = etAlasan.text.toString().trim()
 
-            if (nama.isEmpty()) {
-                etNama.error = "Nama wajib diisi"
-                return@setOnClickListener
-            }
-
-            if (alasan.isEmpty()) {
-                etAlasan.error = "Alasan wajib diisi"
+            // Validasi input dasar
+            if (nama.isEmpty() || alasan.isEmpty()) {
+                Toast.makeText(this, "Nama dan Alasan wajib diisi", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -106,16 +103,17 @@ class DispensasiActivity : BaseActivity() {
                 kelas = "Guru"
                 wali  = "-"
             } else {
-                kelas = spinnerKelas.selectedItem?.toString() ?: ""
-                wali  = etWaliKelas.text.toString().trim()
-
-                if (kelas.isEmpty() || kelas == "Belum join kelas") {
-                    Toast.makeText(this, "Kamu belum join kelas", Toast.LENGTH_SHORT).show()
+                // VALIDASI KRUSIAL: Cek apakah data kelas sudah siap
+                if (muridKelasId.isEmpty()) {
+                    Toast.makeText(this, "Data kelas sedang dimuat, tunggu sebentar...", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
-                if (wali.isEmpty()) {
-                    Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
+                kelas = spinnerKelas.selectedItem?.toString() ?: ""
+                wali  = etWaliKelas.text.toString().trim()
+
+                if (kelas == "Belum join kelas" || wali.isEmpty()) {
+                    Toast.makeText(this, "Pastikan sudah pilih kelas dan wali kelas", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
             }
@@ -142,7 +140,7 @@ class DispensasiActivity : BaseActivity() {
                     db.collection("users").document(uid)
                         .update("totalDispen", FieldValue.increment(1))
 
-                    if (!isGuru && muridKelasId.isNotEmpty()) {
+                    if (!isGuru && muridKelasId.isNotBlank()) {
                         ForumKelasActivity.kirimPesanSistem(
                             db, muridKelasId,
                             "📋 $nama mengajukan DISPENSASI pada $tanggal. Alasan: $alasan"

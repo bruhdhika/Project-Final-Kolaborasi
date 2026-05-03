@@ -1,22 +1,24 @@
 package com.example.e_ntog
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 class ProfileActivity : BaseActivity() {
 
-    private val auth    = FirebaseAuth.getInstance()
-    private val db      = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
     private lateinit var tvNama: TextView
+    private lateinit var tvKelas: TextView
 
     private val editLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -33,148 +35,102 @@ class ProfileActivity : BaseActivity() {
         session = SessionManager(this)
 
         tvNama = findViewById(R.id.namapengguna)
-        val tvKelas = findViewById<TextView>(R.id.kelasdefault)
-        val imgAvatar = findViewById<ImageView>(R.id.img_avatar)
-        val btnBack = findViewById<ImageButton>(R.id.btn_back)
-        val btnEdit = findViewById<ImageButton>(R.id.btn_edit)
-        val btnLogout = findViewById<android.view.View>(R.id.btn_logout)
-        val btnDelete = findViewById<android.view.View>(R.id.btn_delete)
-        val btnKeluarKelas = findViewById<android.view.View>(R.id.btn_keluar_kelas)
-        val txtTidakMasuk = findStatTextView(0)
-        val txtDispen = findStatTextView(1)
-        val txtTerlambat = findStatTextView(2)
+        tvKelas = findViewById(R.id.kelasdefault)
+        val btnEdit = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_edit)
+        val btnLogout = findViewById<View>(R.id.btn_logout)
+        val btnDelete = findViewById<View>(R.id.btn_delete)
+        val btnKeluarKelas = findViewById<View>(R.id.btn_keluar_kelas)
 
-        btnBack.setOnClickListener { finish() }
+        loadProfile()
 
         btnEdit.setOnClickListener {
-            editLauncher.launch(Intent(this, EditDataActivity::class.java))
+            val intent = Intent(this, EditDataActivity::class.java)
+            editLauncher.launch(intent)
         }
 
-
         btnLogout.setOnClickListener {
-
-            val btnKeluarKelas = findViewById<android.view.View>(R.id.btn_keluar_kelas)
-
-            if (session.getRole() == SessionManager.ROLE_MURID) {
-                db.collection("users").document(session.getUid()).get()
-                    .addOnSuccessListener { snap ->
-                        val kelasId = snap.getString("kelasId") ?: ""
-                        if (kelasId.isNotEmpty()) {
-                            btnKeluarKelas.visibility = android.view.View.VISIBLE
-                        }
-                    }
-            }
-
+            AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Yakin ingin keluar dari akun?")
+                .setPositiveButton("Logout") { _, _ ->
+                    auth.signOut()
+                    session.clearSession()
+                    startActivity(Intent(this, LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                }.setNegativeButton("Batal", null).show()
         }
 
         btnDelete.setOnClickListener {
-            android.app.AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle("Hapus Akun")
-                .setMessage("Yakin ingin menghapus akun? Data tidak bisa dikembalikan.")
+                .setMessage("Data kamu tidak bisa dikembalikan. Yakin?")
                 .setPositiveButton("Hapus") { _, _ -> deleteAccount() }
-                .setNegativeButton("Batal", null)
-                .show()
+                .setNegativeButton("Batal", null).show()
         }
 
-        // ===== TAMBAHAN CEK KELAS =====
-        if (session.getRole() == SessionManager.ROLE_MURID) {
-            db.collection("users").document(session.getUid()).get()
-                .addOnSuccessListener { snap ->
-                    val kelasId = snap.getString("kelasId") ?: ""
-                    if (kelasId.isNotEmpty()) {
-                        btnKeluarKelas.visibility = android.view.View.VISIBLE
-                    }
-                }
-        }
-
-        // Tombol Keluar Kelas
         btnKeluarKelas.setOnClickListener {
-            android.app.AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle("Keluar Kelas")
-                .setMessage("Yakin ingin keluar dari kelas ini?\nKamu bisa join kelas lain dengan kode baru.")
+                .setMessage("Kamu tidak akan lagi terdaftar di kelas ini.")
                 .setPositiveButton("Keluar") { _, _ -> keluarDariKelas(btnKeluarKelas) }
-                .setNegativeButton("Batal", null)
-                .show()
+                .setNegativeButton("Batal", null).show()
         }
     }
 
     private fun loadProfile() {
         val uid = session.getUid()
-        if (uid.isEmpty()) return
+        db.collection("users").document(uid).addSnapshotListener { snap, _ ->
+            if (snap == null) return@addSnapshotListener
 
-        db.collection("users").document(uid)
-            .addSnapshotListener { snap, err ->
-                if (err != null || snap == null) return@addSnapshotListener
-                tvNama.text = snap.getString("nama") ?: "-"
-                snap.getString("nama")?.let { session.updateNama(it) }
+            // Set Nama & Kelas
+            tvNama.text = snap.getString("nama") ?: "User"
+            tvKelas.text = snap.getString("kelasNama") ?: "Belum Join Kelas"
 
-                val kelas = snap.getString("kelas")
-                val tvKelas = findViewById<TextView>(R.id.kelasdefault)
-                tvKelas.text = if (!kelas.isNullOrEmpty()) kelas else "Belum diisi"
+            // Ambil ID Stat dari XML yang baru (Gunakan ID yang sudah disesuaikan)
+            findViewById<TextView>(R.id.tv_count_tidak_hadir)?.text = (snap.getLong("totalTidakHadir") ?: 0L).toString()
+            findViewById<TextView>(R.id.tv_count_dispen)?.text     = (snap.getLong("totalDispen")     ?: 0L).toString()
+            findViewById<TextView>(R.id.tv_count_terlambat)?.text  = (snap.getLong("totalTerlambat")  ?: 0L).toString()
 
-                val photoUrl = snap.getString("photoUrl") ?: ""
-                val imgAvatar = findViewById<ImageView>(R.id.img_avatar)
-                if (photoUrl.isNotEmpty()) {
-                    Glide.with(this).load(photoUrl).circleCrop()
-                        .placeholder(R.drawable.image_3)
-                        .into(imgAvatar)
-                }
-
-                updateStatCard(R.id.stat_tidak_masuk, snap.getLong("totalTidakHadir") ?: 0L)
-                updateStatCard(R.id.stat_dispen,      snap.getLong("totalDispen")     ?: 0L)
-                updateStatCard(R.id.stat_terlambat,   snap.getLong("totalTerlambat")  ?: 0L)
+            // Tombol Keluar Kelas khusus Murid
+            val kelasId = snap.getString("kelasId") ?: ""
+            if (session.getRole() == SessionManager.ROLE_MURID && kelasId.isNotEmpty()) {
+                findViewById<View>(R.id.btn_keluar_kelas).visibility = View.VISIBLE
+            } else {
+                findViewById<View>(R.id.btn_keluar_kelas).visibility = View.GONE
             }
+
+            // Update Foto Profil pakai Glide
+            val photoUrl = snap.getString("photoUrl") ?: ""
+            val imgAvatar = findViewById<ImageView>(R.id.img_avatar)
+            if (photoUrl.isNotEmpty()) {
+                Glide.with(this).load(photoUrl).circleCrop()
+                    .placeholder(R.drawable.image_3).into(imgAvatar)
+            }
+        }
     }
 
-    private fun updateStatCard(tvId: Int, value: Long) {
-        try { findViewById<TextView>(tvId)?.text = value.toString() }
-        catch (_: Exception) { }
-    }
-
-    private fun findStatTextView(index: Int): TextView? = null
-
-    // mau keluar kelas??????
-    private fun keluarDariKelas(btnKeluarKelas: android.view.View) {
+    private fun keluarDariKelas(btn: View) {
         val uid = session.getUid()
-
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { snap ->
-                val kelasId = snap.getString("kelasId") ?: ""
-
-                if (kelasId.isNotEmpty()) {
-                    db.collection("kelas").document(kelasId)
-                        .update("jumlahMurid", FieldValue.increment(-1))
+        db.collection("users").document(uid).get().addOnSuccessListener { snap ->
+            val kelasId = snap.getString("kelasId") ?: ""
+            if (kelasId.isNotEmpty()) {
+                db.collection("kelas").document(kelasId).update("jumlahMurid", FieldValue.increment(-1))
+                db.collection("users").document(uid).update("kelasId", "", "kelasNama", "").addOnSuccessListener {
+                    btn.visibility = View.GONE
+                    Toast.makeText(this, "Berhasil keluar kelas", Toast.LENGTH_SHORT).show()
                 }
-
-                db.collection("users").document(uid)
-                    .update(
-                        "kelasId", "",
-                        "kelasNama", ""
-                    )
-                    .addOnSuccessListener {
-                        btnKeluarKelas.visibility = android.view.View.GONE
-                        Toast.makeText(this, "Berhasil keluar dari kelas.", Toast.LENGTH_SHORT).show()
-
-                        startActivity(Intent(this, JoinKelasActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        })
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Gagal keluar: ${it.message}", Toast.LENGTH_SHORT).show()
-                    }
             }
+        }
     }
-    // ===== END =====
 
     private fun deleteAccount() {
-        val uid = session.getUid()
-        db.collection("users").document(uid).delete()
-            .addOnSuccessListener {
-                auth.currentUser?.delete()
-                session.clearSession()
-                startActivity(Intent(this, LoginActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-            }
+        db.collection("users").document(session.getUid()).delete().addOnSuccessListener {
+            auth.currentUser?.delete()
+            session.clearSession()
+            startActivity(Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
+        }
     }
 }

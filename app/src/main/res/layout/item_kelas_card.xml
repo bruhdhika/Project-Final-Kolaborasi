@@ -5,108 +5,118 @@
     android:id="@+id/card_kelas"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
     android:layout_marginBottom="16dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="3dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:background="@drawable/bg_white_card_soft">
+        android:padding="16dp"
+        android:background="@android:color/white">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <!-- Ikon kelas -->
-            <TextView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:text="📚"
-                android:textSize="24sp"
-                android:gravity="center"
-                android:background="@drawable/bg_summary_box"
-                android:layout_marginEnd="16dp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_nama_kelas"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nama Kelas"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121" />
-
-                <TextView
-                    android:id="@+id/tv_jumlah_murid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0 murid terdaftar"
-                    android:textSize="13sp"
-                    android:textColor="#757575"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
-
-            <!-- Panah kanan -->
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_arrow_back"
-                android:rotation="180"
-                app:tint="#9E9E9E" />
-        </LinearLayout>
-
-        <!-- Kode kelas — kotak pill biru -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp"
+        <!-- Ikon Samping (Avatar Kelas) -->
+        <View
+            android:id="@+id/view_icon_bg"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:background="@drawable/bg_summary_box"
-            android:padding="10dp">
+            android:backgroundTint="#F0F4F8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_icon_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📚"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@id/view_icon_bg"
+            app:layout_constraintEnd_toEndOf="@id/view_icon_bg"
+            app:layout_constraintStart_toStartOf="@id/view_icon_bg"
+            app:layout_constraintTop_toTopOf="@id/view_icon_bg" />
+
+        <!-- Info Teks -->
+        <TextView
+            android:id="@+id/tv_nama_kelas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="Nama Kelas"
+            android:textColor="#212121"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btn_hapus_kelas"
+            app:layout_constraintStart_toEndOf="@id/view_icon_bg"
+            app:layout_constraintTop_toTopOf="@id/view_icon_bg" />
+
+        <TextView
+            android:id="@+id/tv_jumlah_murid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="0 murid terdaftar"
+            android:textColor="#757575"
+            android:textSize="13sp"
+            app:layout_constraintStart_toStartOf="@id/tv_nama_kelas"
+            app:layout_constraintTop_toBottomOf="@id/tv_nama_kelas" />
+
+        <!-- Tombol Hapus (Pojok Atas) -->
+        <ImageView
+            android:id="@+id/btn_hapus_kelas"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:src="@android:drawable/ic_menu_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#FF5252" />
+
+        <!-- Area Kode Kelas (Pill Biru Modern) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_code_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_input_white"
+            android:backgroundTint="#F1F6FF"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/view_icon_bg">
 
             <TextView
+                android:id="@+id/label_kode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Kode Kelas: "
-                android:textSize="13sp"
-                android:textColor="#616161" />
+                android:text="KODE AKSES"
+                android:textColor="#0056D2"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_kode_kelas"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="A3F7K2"
-                android:textSize="18sp"
+                android:textColor="#0056D2"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="#1565C0"
-                android:letterSpacing="0.3" />
+                android:letterSpacing="0.2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_kode" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="  ← bagikan ke murid"
-                android:textSize="11sp"
-                android:textColor="#9E9E9E" />
-        </LinearLayout>
-        <ImageView
-            android:id="@+id/btn_hapus_kelas"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="end"
-            android:layout_marginTop="8dp"
-            android:src="@android:drawable/ic_menu_delete"
-            app:tint="#EF5350" />
-    </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

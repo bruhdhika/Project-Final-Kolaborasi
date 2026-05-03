@@ -4,21 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="200dp">
 
-    <!-- 1. Background Image - CenterCrop agar tidak gepeng -->
+    <!-- 1. Background Image - Pakai centerCrop biar gak stretch -->
     <ImageView
-        android:id="@+id/iv_header_bg_siswa"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/matematika" />
 
-    <!-- 2. Overlay Gelap - Agar teks putih kontras dengan background -->
+    <!-- 2. Overlay Gelap - Biar teks putihnya kebaca jelas -->
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#66000000" />
 
-    <!-- 3. Konten Profil Siswa -->
+    <!-- 3. Konten Profil -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,7 +26,7 @@
         android:padding="24dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/tv_nav_profile_siswa"
+            android:id="@+id/iv_nav_profile"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/boy"
@@ -35,20 +34,20 @@
             app:civ_border_width="2dp" />
 
         <TextView
-            android:id="@+id/tv_nav_name_siswa"
+            android:id="@+id/tv_nav_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Nama Siswa"
+            android:text="Nama Guru"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tv_nav_class_siswa"
+            android:id="@+id/tv_nav_role"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kelas"
+            android:text="Wali Kelas"
             android:textColor="#E0E0E0"
             android:textSize="13sp" />
 

@@ -2,6 +2,7 @@ package com.example.e_ntog
 
 import android.graphics.Color
 import android.view.*
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -26,12 +27,11 @@ class WaliKelasAdapter(
         "#1E88E5", "#FB8C00", "#8E24AA"
     )
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val cardWali: MaterialCardView = view.findViewById(R.id.card_wali)
-        val clCardBg: ConstraintLayout = view.findViewById(R.id.cl_card_bg)
-        val ivFoto:   CircleImageView  = view.findViewById(R.id.iv_guru_foto)
-        val tvNama:   TextView         = view.findViewById(R.id.tv_guru_nama)
-        val tvKelas:  TextView         = view.findViewById(R.id.tv_guru_kelas)
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // Hapus cardWali dan clCardBg
+        val ivFoto: ImageView = itemView.findViewById(R.id.ivFotoWali)
+        val tvNama: TextView  = itemView.findViewById(R.id.tvNamaWali)
+        val tvKelas: TextView = itemView.findViewById(R.id.tvKelasWali)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,23 +43,23 @@ class WaliKelasAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val guru = list[position]
 
-        holder.clCardBg.setBackgroundColor(
-            Color.parseColor(cardColors[position % cardColors.size])
-        )
+        // Baris setBackgroundColor dihapus
+
         holder.tvNama.text  = guru.nama
         holder.tvKelas.text = guru.namaKelas.ifEmpty { "Belum memiliki kelas" }
 
         if (guru.photoUrl.isNotEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(guru.photoUrl)
-                .placeholder(R.drawable.image_3)
-                .error(R.drawable.image_3)
+                .placeholder(R.drawable.profile) // Aku ubah jadi icon profile bawaan
+                .error(R.drawable.profile)
                 .into(holder.ivFoto)
         } else {
-            holder.ivFoto.setImageResource(R.drawable.image_3)
+            holder.ivFoto.setImageResource(R.drawable.profile)
         }
 
-        holder.cardWali.setOnClickListener { onGuruClick(guru) }
+        // Pakai itemView untuk klik seluruh card
+        holder.itemView.setOnClickListener { onGuruClick(guru) }
     }
 
     override fun getItemCount() = list.size

@@ -59,30 +59,30 @@ class HomeActivity : BaseActivity() {
 
         // Inisialisasi Header Menu (Nama & Kelas)
         val headerView = navigationView.getHeaderView(0)
-        val tvNavName = headerView.findViewById<TextView>(R.id.tv_nav_name)
-        val tvNavClass = headerView.findViewById<TextView>(R.id.tv_nav_class)
+        val tvNavName = headerView.findViewById<TextView>(R.id.tv_nav_name_siswa) // Tambahkan _siswa
+        val tvNavClass = headerView.findViewById<TextView>(R.id.tv_nav_class_siswa)
 
-        // Set Data Awal
-        findViewById<TextView>(R.id.tv_greeting).text = "Hi ${session.getNama()}"
-        tvNavName.text = session.getNama()
+        // Set Data Awal - Gunakan safe call (?) agar tidak crash jika ID salah
+        findViewById<TextView>(R.id.tv_greeting)?.text = "Hi ${session.getNama()}"
+        tvNavName?.text = session.getNama()
 
         // Buka Drawer dari Kanan
-        findViewById<ImageView>(R.id.iv_header_icon).setOnClickListener {
+        findViewById<ImageView>(R.id.iv_header_icon)?.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.END)
         }
 
-        // Ambil Data Realtime dari Firestore (Hanya ditulis satu kali)
+        // Ambil Data Realtime dari Firestore
         db.collection("users").document(session.getUid())
             .addSnapshotListener { snap, _ ->
                 snap?.let {
-                    // Update Angka Rekapitulasi
-                    findViewById<TextView>(R.id.txtTotalIzinTerlambat).text = (it.getLong("totalTerlambat") ?: 0L).toString()
-                    findViewById<TextView>(R.id.txtTotalIzinTidakHadir).text = (it.getLong("totalTidakHadir") ?: 0L).toString()
-                    findViewById<TextView>(R.id.txtTotalDispen).text = (it.getLong("totalDispen") ?: 0L).toString()
+                    // Update Angka Rekapitulasi - TAMBAHKAN '?' SEBELUM '.text'
+                    findViewById<TextView>(R.id.txtTotalIzinTerlambat)?.text = (it.getLong("totalTerlambat") ?: 0L).toString()
+                    findViewById<TextView>(R.id.txtTotalIzinTidakHadir)?.text = (it.getLong("totalTidakHadir") ?: 0L).toString()
+                    findViewById<TextView>(R.id.txtTotalDispen)?.text = (it.getLong("totalDispen") ?: 0L).toString()
 
                     // Update Nama & Kelas di Drawer
-                    tvNavName.text = it.getString("nama") ?: session.getNama()
-                    tvNavClass.text = it.getString("kelas") ?: "-"
+                    tvNavName?.text = it.getString("nama") ?: session.getNama()
+                    tvNavClass?.text = it.getString("kelas") ?: "-"
                 }
             }
 

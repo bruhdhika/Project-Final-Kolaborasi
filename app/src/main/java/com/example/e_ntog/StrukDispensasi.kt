@@ -53,9 +53,11 @@ setupBackButton()
         val tvKelas = findViewById<TextView>(R.id.tv_struk_kelas)
         val tvAlasan = findViewById<TextView>(R.id.tv_struk_alasan)
         val tvWali = findViewById<TextView>(R.id.tv_struk_wali)
-        val btnKembaliHome = findViewById<AppCompatButton>(R.id.btn_kembali_home)
-        val btnDownload = findViewById<Button>(R.id.btn_download)
-        val backButton = findViewById<ImageView>(R.id.iv_back_arrow)
+
+        // Gunakan <View> agar aman dari salah tipe data
+        val btnKembaliHome = findViewById<View>(R.id.btn_kembali_home)
+        val btnDownload    = findViewById<View>(R.id.btn_download)
+        val backButton     = findViewById<ImageView>(R.id.iv_back_arrow)
 
         // Set text
         tvNama.text = "Nama : $nama"
@@ -70,9 +72,9 @@ setupBackButton()
 
         // Tombol balik ke home
         btnKembaliHome.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
+            val hIntent = Intent(this, HomeActivity::class.java)
+            hIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(hIntent)
             finish()
         }
 

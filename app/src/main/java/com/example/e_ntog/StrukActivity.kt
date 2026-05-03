@@ -53,7 +53,7 @@ setupBackButton()
         val tvKelas = findViewById<TextView>(R.id.tv_struk_kelas)
         val tvAlasan = findViewById<TextView>(R.id.tv_struk_alasan)
         val tvWali = findViewById<TextView>(R.id.tv_struk_wali)
-        val btnKembaliHome = findViewById<AppCompatButton>(R.id.btn_kembali_home)
+        val btnKembaliHome = findViewById<View>(R.id.btn_kembali_home)
         val btnDownload = findViewById<Button>(R.id.btn_download)
         val backButton = findViewById<ImageView>(R.id.iv_back_arrow)
 

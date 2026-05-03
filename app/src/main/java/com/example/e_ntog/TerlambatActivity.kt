@@ -9,11 +9,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import java.text.SimpleDateFormat
-import java.util.*
 
 class TerlambatActivity : BaseActivity() {
 
@@ -27,8 +24,7 @@ class TerlambatActivity : BaseActivity() {
     private lateinit var clSearchWali: ConstraintLayout
     private lateinit var btnSubmit: AppCompatButton
 
-    private lateinit var waliLauncher: ActivityResultLauncher<Intent> // ✅ FIX
-
+    private lateinit var waliLauncher: ActivityResultLauncher<Intent>
     private var muridKelasId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +33,7 @@ class TerlambatActivity : BaseActivity() {
         setupBackButton()
         session = SessionManager(this)
 
+        // Inisialisasi View
         etNama       = findViewById(R.id.et_nama)
         spinnerKelas = findViewById(R.id.spinner_kelas)
         etAlasan     = findViewById(R.id.et_alasan)
@@ -45,63 +42,79 @@ class TerlambatActivity : BaseActivity() {
         btnSubmit    = findViewById(R.id.btn_submit)
 
         etNama.setText(session.getNama())
-
         val isGuru = session.getRole() == SessionManager.ROLE_GURU
 
         if (!isGuru) {
             loadKelasSpinner()
 
-            waliLauncher = registerForActivityResult(
-                ActivityResultContracts.StartActivityForResult()
-            ) { result ->
+            waliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
                     etWaliKelas.setText(namaWali)
                 }
             }
 
-            val openWali = {
-                waliLauncher.launch(Intent(this, WaliKelasActivity::class.java))
-            }
-
+            val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
             clSearchWali.setOnClickListener { openWali() }
-            findViewById<ImageView>(R.id.iv_search_icon)
-                .setOnClickListener { openWali() }
+            etWaliKelas.setOnClickListener { openWali() }
         } else {
             spinnerKelas.visibility = View.GONE
             clSearchWali.visibility = View.GONE
         }
 
+        // --- TOMBOL SUBMIT ---
         btnSubmit.setOnClickListener {
-            // (biarin sama seperti punyamu, ini nggak error)
+            val nama = etNama.text.toString().trim()
+            val alasan = etAlasan.text.toString().trim()
+            val wali = etWaliKelas.text.toString().trim()
+            val kelas = spinnerKelas.selectedItem?.toString() ?: ""
+
+            if (nama.isEmpty() || alasan.isEmpty() || (!isGuru && wali.isEmpty())) {
+                Toast.makeText(this, "Data belum lengkap!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            btnSubmit.isEnabled = false
+
+            val data = hashMapOf(
+                "nama" to nama,
+                "kelas" to kelas,
+                "alasan" to alasan,
+                "waliKelas" to wali,
+                "tipe" to "TERLAMBAT",
+                "timestamp" to FieldValue.serverTimestamp()
+            )
+
+            db.collection("laporan_terlambat").add(data).addOnSuccessListener {
+                // Pindah ke Struk
+                val intent = Intent(this, StrukActivity::class.java)
+                intent.putExtra("NAMA", nama)
+                intent.putExtra("KELAS", kelas)
+                intent.putExtra("ALASAN", alasan)
+                intent.putExtra("WALI_KELAS", wali)
+                startActivity(intent)
+                finish()
+            }.addOnFailureListener {
+                btnSubmit.isEnabled = true
+                Toast.makeText(this, "Gagal: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
+    } // Akhir onCreate
 
     private fun loadKelasSpinner() {
-        db.collection("users").document(session.getUid()).get()
-            .addOnSuccessListener { userDoc ->
-                val kelasId   = userDoc.getString("kelasId")   ?: ""
-                val kelasNama = userDoc.getString("kelasNama") ?: ""
-                muridKelasId  = kelasId
+        db.collection("users").document(session.getUid()).get().addOnSuccessListener { userDoc ->
+            val kelasId = userDoc.getString("kelasId") ?: ""
+            muridKelasId = kelasId
 
-                if (kelasId.isEmpty()) {
-                    spinnerKelas.adapter = ArrayAdapter(
-                        this,
-                        android.R.layout.simple_spinner_item,
-                        listOf("Belum join kelas")
-                    )
-                    return@addOnSuccessListener
-                }
-
-                db.collection("kelas").document(kelasId).get()
-                    .addOnSuccessListener { kelasDoc ->
-                        val nama = kelasDoc.getString("namaKelas") ?: kelasNama
-                        spinnerKelas.adapter = ArrayAdapter(
-                            this,
-                            android.R.layout.simple_spinner_item,
-                            listOf(nama)
-                        )
-                    }
+            if (kelasId.isEmpty()) {
+                spinnerKelas.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("Belum join kelas"))
+                return@addOnSuccessListener
             }
+
+            db.collection("kelas").document(kelasId).get().addOnSuccessListener { kelasDoc ->
+                val nama = kelasDoc.getString("namaKelas") ?: "Kelas"
+                spinnerKelas.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf(nama))
+            }
+        }
     }
 }

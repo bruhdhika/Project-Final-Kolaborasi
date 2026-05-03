@@ -35,12 +35,20 @@ class WaliKelasActivity : AppCompatActivity() {
         ivBack.setOnClickListener { finish() }
 
         adapter = WaliKelasAdapter(filteredGuruList) { guru ->
-            val intent = Intent(this, DetailWaliActivity::class.java)
-            intent.putExtra("GURU_UID",   guru.uid)
-            intent.putExtra("GURU_NAMA",  guru.nama)
-            intent.putExtra("GURU_KELAS", guru.namaKelas)
-            intent.putExtra("GURU_PHOTO", guru.photoUrl)
-            startActivityForResult(intent, REQUEST_DETAIL_WALI)
+            // 1. Kirim hasil nama wali ke Activity sebelumnya (Dispensasi/Terlambat/dll)
+            val resultIntent = Intent()
+            resultIntent.putExtra("NAMA_WALI_TERPILIH", guru.nama)
+            setResult(Activity.RESULT_OK, resultIntent)
+
+            // 2. Buka ChatActivity untuk chat langsung
+            val chatIntent = Intent(this, ChatActivity::class.java).apply {
+                putExtra("OTHER_UID", guru.uid)
+                putExtra("OTHER_NAMA", guru.nama)
+            }
+            startActivity(chatIntent)
+
+            // 3. Tutup halaman pilih wali kelas ini
+            finish()
         }
 
         rvWali.layoutManager = LinearLayoutManager(this)
@@ -122,16 +130,6 @@ class WaliKelasActivity : AppCompatActivity() {
         tv.visibility = View.VISIBLE
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_DETAIL_WALI && resultCode == Activity.RESULT_OK) {
-            val namaWali = data?.getStringExtra("NAMA_WALI_TERPILIH") ?: ""
-            setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra("NAMA_WALI_TERPILIH", namaWali)
-            })
-            finish()
-        }
-    }
 
     private fun filterGuru(keyword: String, rv: RecyclerView, tvEmpty: TextView) {
         filteredGuruList.clear()
@@ -142,9 +140,5 @@ class WaliKelasActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
         tvEmpty.visibility = if (filteredGuruList.isEmpty()) View.VISIBLE else View.GONE
         rv.visibility      = if (filteredGuruList.isEmpty()) View.GONE   else View.VISIBLE
-    }
-
-    companion object {
-        const val REQUEST_DETAIL_WALI = 101
     }
 }

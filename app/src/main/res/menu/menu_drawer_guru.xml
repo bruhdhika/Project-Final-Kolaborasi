@@ -18,6 +18,11 @@
         android:icon="@android:drawable/ic_dialog_info" />
 
     <item
+        android:id="@+id/nav_pesan_guru"
+        android:icon="@android:drawable/ic_dialog_email"
+    android:title="Pesan Masuk" />
+
+    <item
         android:id="@+id/nav_terlambat"
         android:title="Izin Terlambat (Pribadi)"
         android:icon="@drawable/running" />

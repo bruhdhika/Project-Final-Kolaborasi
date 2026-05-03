@@ -76,6 +76,7 @@ class TidakHadirActivity : BaseActivity() {
             val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
             clSearchWali.setOnClickListener { openWali() }
             ivSearchWali.setOnClickListener { openWali() }
+            etWaliKelas.setOnClickListener { openWali() }
         }
 
         btnSubmit.setOnClickListener {

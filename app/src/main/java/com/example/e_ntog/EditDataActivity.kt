@@ -47,8 +47,8 @@ class EditDataActivity : BaseActivity() {
         val etConfirm     = findViewById<EditText>(R.id.et_confirm_password)
         val layoutConfirm = findViewById<android.widget.LinearLayout>(R.id.layout_konfirmasi_pass)
         val btnSimpan     = findViewById<Button>(R.id.btn_simpan_perubahan)
-        val btnChangePhoto= findViewById<ImageButton>(R.id.btn_change_photo)
-        val imgAvatar     = findViewById<CircleImageView>(R.id.edit_img_avatar)
+        val btnChangePhoto = findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.btn_change_photo)
+        val imgAvatar      = findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.edit_img_avatar)
 
         val uid = session.getUid()
 
@@ -71,7 +71,9 @@ class EditDataActivity : BaseActivity() {
             override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
         })
 
-        btnChangePhoto.setOnClickListener { pickImageLauncher.launch("image/*") }
+        btnChangePhoto.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
 
         btnSimpan.setOnClickListener {
             val namaBaru    = etNama.text.toString().trim()

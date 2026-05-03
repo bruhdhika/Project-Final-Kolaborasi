@@ -35,7 +35,9 @@ class AnnouncementActivity : BaseActivity() {
         setContentView(R.layout.activity_announcement)
 
         // 1. PANGGIL BACK BUTTON DULU
-        setupBackButton()
+        findViewById<ImageView>(R.id.iv_back_anno).setOnClickListener {
+            finish()
+        }
 
         session = SessionManager(this)
 

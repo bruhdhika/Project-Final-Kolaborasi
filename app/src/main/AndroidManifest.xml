@@ -51,8 +51,7 @@
             android:name=".ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".EditDataActivity"
-            android:exported="false" />
+            android:name=".EditDataActivity" />
         <activity
             android:name=".NamaEmailActivity"
             android:exported="false" />
@@ -92,6 +91,7 @@
         <activity
             android:name=".AnnouncementActivity"
             android:exported="false" />
+        <activity android:name=".DaftarPesanActivity" />
     </application>
 
 </manifest>

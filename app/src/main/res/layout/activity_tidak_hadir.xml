@@ -186,7 +186,7 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="48dp"
                     android:focusable="false"
-                    android:clickable="false"
+                    android:clickable="true"
                     android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/iv_search_icon"

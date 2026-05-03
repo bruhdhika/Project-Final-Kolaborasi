@@ -13,15 +13,18 @@ class GuruAdapter(
 ) : RecyclerView.Adapter<GuruAdapter.GuruViewHolder>() {
 
     inner class GuruViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvNamaGuru: TextView = itemView.findViewById(R.id.tv_nama_guru)
-        val ivFotoGuru: ImageView = itemView.findViewById(R.id.iv_foto_guru)
+        // PERBAIKAN BARIS 16 & 17: Ganti 'view' jadi 'itemView'
+        val namaGuru: TextView = itemView.findViewById(R.id.tvNamaGuru)
+        val fotoGuru: ImageView = itemView.findViewById(R.id.ivFotoGuru)
 
         fun bind(guru: GuruModel) {
-            tvNamaGuru.text = guru.nama
+            // PERBAIKAN BARIS 20: Panggil 'namaGuru', bukan 'tvNamaGuru'
+            namaGuru.text = guru.nama
 
             // Jika ada sistem foto, bisa menggunakan Glide di sini.
             // Untuk sementara kita gunakan icon default.
-            ivFotoGuru.setImageResource(R.drawable.profile)
+            // PERBAIKAN BARIS 24: Panggil 'fotoGuru', bukan 'ivFotoGuru'
+            fotoGuru.setImageResource(R.drawable.profile)
 
             itemView.setOnClickListener {
                 onItemClick(guru)

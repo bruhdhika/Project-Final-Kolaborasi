@@ -44,8 +44,11 @@ class HomeGuruActivity : BaseActivity() {
         val ivMenuIcon     = findViewById<ImageView>(R.id.iv_header_icon)
         val drawerLayout   = findViewById<DrawerLayout>(R.id.drawerLayout)
         val navigationView = findViewById<NavigationView>(R.id.navigationView)
+        val headerView = navigationView.getHeaderView(0)
+        val tvHeaderNama = headerView.findViewById<TextView>(R.id.tv_nav_name)
 
         tvGreeting.text = "Halo, ${session.getNama()}"
+        tvHeaderNama.text = session.getNama()
 
         adapter = KelasAdapter(
             kelasList,
@@ -67,7 +70,9 @@ class HomeGuruActivity : BaseActivity() {
                 R.id.nav_profile      -> startActivity(Intent(this, ProfileActivity::class.java))
                 R.id.nav_chat_forum   -> startActivity(Intent(this, ForumKelasActivity::class.java))
                 R.id.nav_announcement -> startActivity(Intent(this, AnnouncementActivity::class.java))
-                // Guru juga bisa ajukan izin untuk dirinya sendiri
+                R.id.nav_pesan_guru -> {
+                    startActivity(Intent(this, DaftarPesanActivity::class.java))
+                }
                 R.id.nav_terlambat    -> startActivity(Intent(this, TerlambatActivity::class.java))
                 R.id.nav_dispen       -> startActivity(Intent(this, DispensasiActivity::class.java))
                 R.id.nav_tidak_hadir  -> startActivity(Intent(this, TidakHadirActivity::class.java))
