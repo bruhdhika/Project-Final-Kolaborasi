@@ -19,9 +19,9 @@ class TidakHadirActivity : BaseActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
-    private lateinit var waliLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var etNama: EditText
+    private lateinit var waliLauncher: ActivityResultLauncher<Intent>
     private lateinit var spinnerKelas: Spinner
     private lateinit var etAlasan: EditText
     private lateinit var etWaliKelas: EditText

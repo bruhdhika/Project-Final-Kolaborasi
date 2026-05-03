@@ -1,23 +1,19 @@
 package com.example.e_ntog
 
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 open class BaseActivity : AppCompatActivity() {
 
-    /**
-     * Pasang FAB back (fabNext dari layout_arrow) DAN ImageView back arrow jika ada.
-     * Harus dipanggil SETELAH setContentView().
-     */
     protected fun setupBackButton() {
-        // 1. FAB dari layout_arrow (fabNext)
-        val fabBack = findViewById<FloatingActionButton>(R.id.fabNext)
-        fabBack?.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        // Cari ID btn_back (ImageButton) atau fabNext (FAB)
+        val ids = arrayOf(R.id.btn_back)
 
-        // 2. ImageView back arrow (iv_back_arrow) — banyak layout pakai ini
-        val ivBack = try {
-            findViewById<android.widget.ImageView>(R.id.iv_back_arrow)
-        } catch (e: Exception) { null }
-        ivBack?.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        for (id in ids) {
+            val view = findViewById<View>(id)
+            view?.setOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+        }
     }
 }

@@ -19,7 +19,6 @@ class DispensasiActivity : BaseActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var session: SessionManager
-    private lateinit var waliLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var etNama: EditText
     private lateinit var spinnerKelas: Spinner
@@ -27,6 +26,8 @@ class DispensasiActivity : BaseActivity() {
     private lateinit var etWaliKelas: EditText
     private lateinit var clSearchWali: ConstraintLayout
     private lateinit var btnSubmit: AppCompatButton
+
+    private lateinit var waliLauncher: ActivityResultLauncher<Intent> // ✅ FIX
 
     private var muridKelasId = ""
 
@@ -60,25 +61,43 @@ class DispensasiActivity : BaseActivity() {
 
             loadKelasSpinner()
 
-            waliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            // ✅ REGISTER launcher
+            waliLauncher = registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
                     etWaliKelas.setText(namaWali)
                     clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
-                    etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
+                    etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(
+                        0, 0, R.drawable.ic_check_circle, 0
+                    )
                     etWaliKelas.setPadding(16, 0, 16, 0)
                 }
             }
-            val openWali = { waliLauncher.launch(Intent(this, WaliKelasActivity::class.java)) }
+
+            val openWali = {
+                waliLauncher.launch(Intent(this, WaliKelasActivity::class.java))
+            }
+
             clSearchWali.setOnClickListener { openWali() }
-            findViewById<ImageView>(R.id.iv_search_icon).setOnClickListener { openWali() }
+            findViewById<ImageView>(R.id.iv_search_icon)
+                .setOnClickListener { openWali() }
         }
 
         btnSubmit.setOnClickListener {
             val nama   = etNama.text.toString().trim()
             val alasan = etAlasan.text.toString().trim()
-            if (nama.isEmpty())   { etNama.error = "Nama wajib diisi";   return@setOnClickListener }
-            if (alasan.isEmpty()) { etAlasan.error = "Alasan wajib diisi"; return@setOnClickListener }
+
+            if (nama.isEmpty()) {
+                etNama.error = "Nama wajib diisi"
+                return@setOnClickListener
+            }
+
+            if (alasan.isEmpty()) {
+                etAlasan.error = "Alasan wajib diisi"
+                return@setOnClickListener
+            }
 
             val kelas: String
             val wali: String
@@ -89,10 +108,12 @@ class DispensasiActivity : BaseActivity() {
             } else {
                 kelas = spinnerKelas.selectedItem?.toString() ?: ""
                 wali  = etWaliKelas.text.toString().trim()
+
                 if (kelas.isEmpty() || kelas == "Belum join kelas") {
                     Toast.makeText(this, "Kamu belum join kelas", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+
                 if (wali.isEmpty()) {
                     Toast.makeText(this, "Pilih wali kelas terlebih dahulu", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
@@ -100,6 +121,7 @@ class DispensasiActivity : BaseActivity() {
             }
 
             btnSubmit.isEnabled = false
+
             val uid     = session.getUid()
             val tanggal = SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(Date())
 
@@ -128,12 +150,14 @@ class DispensasiActivity : BaseActivity() {
                     }
 
                     btnSubmit.isEnabled = true
+
                     startActivity(Intent(this, StrukDispensasi::class.java).apply {
                         putExtra("NAMA", nama)
                         putExtra("KELAS", kelas)
                         putExtra("ALASAN", alasan)
                         putExtra("WALI_KELAS", wali)
                     })
+
                     finish()
                 }
                 .addOnFailureListener {
@@ -151,17 +175,27 @@ class DispensasiActivity : BaseActivity() {
                 muridKelasId  = kelasId
 
                 if (kelasId.isEmpty()) {
-                    spinnerKelas.adapter = ArrayAdapter(this,
-                        android.R.layout.simple_spinner_item, listOf("Belum join kelas"))
-                        .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+                    spinnerKelas.adapter = ArrayAdapter(
+                        this,
+                        android.R.layout.simple_spinner_item,
+                        listOf("Belum join kelas")
+                    ).also {
+                        it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    }
                     return@addOnSuccessListener
                 }
+
                 db.collection("kelas").document(kelasId).get()
                     .addOnSuccessListener { kelasDoc ->
                         val nama = kelasDoc.getString("namaKelas") ?: kelasNama
-                        spinnerKelas.adapter = ArrayAdapter(this,
-                            android.R.layout.simple_spinner_item, listOf(nama))
-                            .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+                        spinnerKelas.adapter = ArrayAdapter(
+                            this,
+                            android.R.layout.simple_spinner_item,
+                            listOf(nama)
+                        ).also {
+                            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        }
                     }
             }
     }

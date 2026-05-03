@@ -1,148 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="#F8F9FA"
     tools:context=".StrukDispensasi">
 
     <ImageView
-        android:id="@+id/iv_header"
-        android:layout_width="0dp"
-        android:layout_height="180dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/matematika"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="Header Background" />
-
-    <ImageView
         android:id="@+id/iv_back_arrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:src="@drawable/ic_arrow_back"
-        android:padding="16dp"
-        android:layout_marginTop="32dp"
-        app:tint="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        app:tint="#202124"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="Tombol Kembali" />
 
-    <View
-        android:id="@+id/view_white_bg"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="130dp"
-        android:background="@drawable/bg_white_curved_top"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_struk"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="32dp"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="#F5F5F5"
-        app:layout_constraintTop_toBottomOf="@id/iv_header"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.1">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/iv_header"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_check_circle"
+            app:tint="#0F9D58"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Header Background"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Struk Dispensasi"
+            android:textColor="#202124"
+            android:textSize="24sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rincian dispensasi telah dicatat."
+            android:textColor="#5F6368"
+            android:layout_marginTop="4dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_struk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_marginTop="32dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#E8EAED"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="@android:color/white">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="STRUK DISPENSASI"
-                android:textColor="@android:color/black"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:gravity="center" />
+                android:orientation="vertical"
+                android:padding="24dp">
 
-            <TextView
-                android:id="@+id/tv_struk_nama"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Nama : Loading..."
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rincian Pengajuan"
+                    android:textStyle="bold"
+                    android:textColor="#202124"
+                    android:layout_marginBottom="16dp"/>
 
-            <TextView
-                android:id="@+id/tv_struk_kelas"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Kelas : Loading..."
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/tv_struk_nama"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nama : Loading..."
+                    android:textColor="#202124"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
 
-            <TextView
-                android:id="@+id/tv_struk_alasan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Alasan Dispensasi : Loading..."
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/tv_struk_kelas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Kelas : Loading..."
+                    android:textColor="#202124"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
 
-            <TextView
-                android:id="@+id/tv_struk_wali"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Wali Kelas : Loading..."
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/tv_struk_alasan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Alasan Dispensasi : Loading..."
+                    android:textColor="#202124"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_struk_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Sudah Menghubungi Wali Kelas"
-                android:textColor="@android:color/white"
-                android:background="@drawable/bg_button_green"
-                android:layout_marginTop="24dp" />
+                <TextView
+                    android:id="@+id/tv_struk_wali"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Wali Kelas : Loading..."
+                    android:textColor="#202124"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="16dp"/>
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_struk_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Sudah Menghubungi Wali Kelas"
+                    android:textColor="#0F9D58"
+                    android:background="#E6F4EA"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E8EAED"
+                    android:layout_marginBottom="16dp"/>
 
-    <Button
-        android:id="@+id/btn_download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Download Struk"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/card_struk"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+                <TextView
+                    android:id="@+id/btn_kembali_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center"
+                    android:text="Kembali Ke Home Page"
+                    android:textColor="#0056D2"
+                    android:textStyle="bold"/>
 
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_kembali_home"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/bg_button_blue"
-        android:text="Kembali Ke Home Page"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <Button
+            android:id="@+id/btn_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Download Struk"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="#5F6368"
+            android:layout_marginTop="16dp" />
 
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

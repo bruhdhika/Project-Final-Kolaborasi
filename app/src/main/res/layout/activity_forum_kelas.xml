@@ -2,106 +2,137 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="#F8F9FA"
+    tools:ignore="all">
 
-    <!-- Header -->
     <LinearLayout
         android:id="@+id/header_forum"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:background="#1565C0"
-        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/iv_back_forum"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#FFFFFF"
-            android:layout_marginEnd="12dp"
-            android:padding="4dp" />
+            android:padding="12dp"
+            app:tint="#202124" />
 
         <TextView
             android:id="@+id/tv_forum_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="8dp"
             android:text="Forum Kelas"
-            android:textColor="#FFFFFF"
+            android:textColor="#202124"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Selector kelas untuk GURU (default GONE) -->
-    <TextView
-        android:id="@+id/tv_forum_kelas_selector"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:text="Pilih Kelas ▼"
-        android:textColor="#1565C0"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:gravity="center_vertical"
-        android:background="@android:color/white"
-        android:paddingHorizontal="16dp"
-        android:elevation="2dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/header_forum"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_selector_forum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#E8EAED"
+        app:layout_constraintTop_toBottomOf="@id/header_forum">
 
-    <!-- List pesan -->
+        <TextView
+            android:id="@+id/tv_forum_kelas_selector"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Pilih Kelas ▼"
+            android:textColor="#0056D2"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:background="@android:color/white"
+            android:visibility="gone" />
+    </com.google.android.material.card.MaterialCardView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_forum"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="12dp"
+        android:clipToPadding="false"
+        app:layout_constraintTop_toBottomOf="@id/card_selector_forum"
+        app:layout_constraintBottom_toTopOf="@id/input_container_forum" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/input_container_forum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        app:cardCornerRadius="28dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#E8EAED"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/input_bar_forum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/et_forum_pesan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Tulis pesan ke kelas..."
+                android:inputType="textMultiLine"
+                android:maxLines="4"
+                android:paddingVertical="12dp"
+                android:paddingHorizontal="20dp"
+                android:textSize="14sp"
+                android:textColor="#202124"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#0D47A1">
+
+                <ImageView
+                    android:id="@+id/iv_forum_kirim"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_menu_send"
+                    android:padding="12dp"
+                    app:tint="@android:color/white" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/tv_forum_kelas_selector"
-        app:layout_constraintBottom_toTopOf="@id/input_bar_forum"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Input bar -->
-    <LinearLayout
-        android:id="@+id/input_bar_forum"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <EditText
-            android:id="@+id/et_forum_pesan"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/bg_edittext_grey"
-            android:hint="Tulis pesan ke kelas..."
-            android:inputType="textMultiLine"
-            android:maxLines="4"
-            android:padding="12dp"
-            android:layout_marginEnd="8dp" />
-
-        <ImageView
-            android:id="@+id/iv_forum_kirim"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@android:drawable/ic_menu_send"
-            android:background="#1565C0"
-            android:padding="12dp"
-            app:tint="#FFFFFF" />
-    </LinearLayout>
+        android:visibility="gone"
+        tools:ignore="MissingConstraints">
+        <include layout="@layout/layout_arrow" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

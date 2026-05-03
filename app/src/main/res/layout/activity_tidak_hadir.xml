@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    tools:context=".DispensasiActivity">
+    android:background="#F8F9FA"
+    tools:context=".TidakHadirActivity"
+    tools:ignore="all">
 
     <ImageView
         android:id="@+id/iv_header"
         android:layout_width="0dp"
-        android:layout_height="250dp"
+        android:layout_height="220dp"
         android:scaleType="centerCrop"
         android:src="@drawable/header_background"
         android:contentDescription="Header Background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="220dp"
+        android:background="#4D000000"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -24,7 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/bg_white_curved_top"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="160dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,11 +42,14 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_logo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#E8EAED"
+        app:strokeWidth="2dp"
         app:layout_constraintTop_toTopOf="@id/view_white_bg"
+        app:layout_constraintBottom_toTopOf="@id/view_white_bg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -45,115 +58,123 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="#E0F7FA">
+            android:background="@android:color/white">
 
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/where"
-                android:scaleType="fitCenter"
-                android:contentDescription="Logo Dispensasi" />
+                android:scaleType="fitCenter" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tidak Hadir"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:layout_marginTop="8dp" />
-
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#202124"
+                android:layout_marginTop="4dp" />
         </LinearLayout>
-
     </com.google.android.material.card.MaterialCardView>
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/card_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="32dp"
-            android:paddingBottom="32dp">
+            android:paddingBottom="40dp">
 
-            <!-- NAMA -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Form Izin Tidak Hadir"
+                android:textColor="#202124"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="24dp"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nama"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:text="Nama Lengkap"
+                android:textStyle="bold"
+                android:textColor="#3C4043"
+                android:textSize="14sp" />
 
             <EditText
                 android:id="@+id/et_nama"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/input"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_gray"
                 android:hint="Masukkan nama lengkap"
                 android:inputType="textPersonName"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp"
                 android:layout_marginTop="8dp" />
 
-            <!-- KELAS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kelas"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#3C4043"
+                android:textSize="14sp"
                 android:layout_marginTop="16dp" />
 
             <Spinner
                 android:id="@+id/spinner_kelas"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/input"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_gray"
+                android:paddingHorizontal="12dp"
                 android:layout_marginTop="8dp" />
 
-            <!-- ALASAN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Alasan Tidak Hadir"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#3C4043"
+                android:textSize="14sp"
                 android:layout_marginTop="16dp" />
 
             <EditText
                 android:id="@+id/et_alasan"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minLines="3"
-                android:gravity="top"
-                android:background="@drawable/bg_edittext_grey"
-                android:hint="Tuliskan alasanmu..."
+                android:layout_height="100dp"
+                android:gravity="top|start"
+                android:background="@drawable/bg_input_gray"
+                android:hint="Sakit / Izin Acara Keluarga..."
                 android:inputType="textMultiLine"
                 android:padding="16dp"
+                android:textSize="14sp"
                 android:layout_marginTop="8dp" />
 
-            <!-- WALI KELAS -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hubungi Wali Kelas"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
+                android:text="Wali Kelas"
+                android:textStyle="bold"
+                android:textColor="#3C4043"
+                android:textSize="14sp"
                 android:layout_marginTop="16dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cl_search_wali"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/input"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_input_gray"
                 android:layout_marginTop="8dp">
 
                 <EditText
@@ -161,11 +182,12 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@null"
-                    android:hint="Cari Wali Kelas"
+                    android:hint="Pilih Wali Kelas"
                     android:paddingStart="16dp"
                     android:paddingEnd="48dp"
                     android:focusable="false"
                     android:clickable="false"
+                    android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/iv_search_icon"
                     app:layout_constraintTop_toTopOf="parent"
@@ -175,9 +197,8 @@
                     android:id="@+id/iv_search_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_logo"
+                    android:src="@drawable/search"
                     android:layout_marginEnd="16dp"
-                    android:contentDescription="Cari"
                     app:tint="#808080"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -185,19 +206,27 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- BUTTON -->
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_submit"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:background="@drawable/bg_button_blue"
-                android:text="Submit"
+                android:layout_marginTop="32dp"
+                android:text="Kirim Laporan"
+                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:layout_marginTop="32dp" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#0056D2" />
 
         </LinearLayout>
-
     </ScrollView>
-    <include layout="@layout/layout_arrow" />
+
+    <include
+        layout="@layout/layout_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

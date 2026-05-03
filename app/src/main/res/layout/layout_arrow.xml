@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.floatingactionbutton.FloatingActionButton
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fabNext"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="top|start"
-    android:layout_margin="20dp"
-    app:srcCompat="@drawable/ic_arrow_back"
-    app:backgroundTint="#007bff"
-    app:tint="@android:color/white" />
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btn_back"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_margin="16dp"
+    android:background="?attr/selectableItemBackgroundBorderless"
+    android:src="@drawable/ic_arrow_back_vector"
+    android:scaleType="centerInside"
+    android:padding="12dp"
+    android:contentDescription="Tombol Kembali"
+    android:elevation="0dp"
+    android:tint="#202124" />
