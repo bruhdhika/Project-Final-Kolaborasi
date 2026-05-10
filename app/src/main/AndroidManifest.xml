@@ -83,6 +83,9 @@
             android:name=".StrukTidakHadir"
             android:exported="false" />
         <activity
+            android:name=".StrukTerlambat"
+            android:exported="false" />
+        <activity
             android:name=".ChatActivity"
             android:exported="false" />
         <activity

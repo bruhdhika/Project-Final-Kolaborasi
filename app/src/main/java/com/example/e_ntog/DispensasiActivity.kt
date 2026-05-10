@@ -120,7 +120,7 @@ class DispensasiActivity : BaseActivity() {
 
             btnSubmit.isEnabled = false
 
-            val uid     = session.getUid()
+            val uid = session.getUid()
             val tanggal = SimpleDateFormat("dd MMMM yyyy", Locale("id")).format(Date())
 
             val historyData = hashMapOf(
@@ -133,31 +133,46 @@ class DispensasiActivity : BaseActivity() {
                 "status"    to "pending"
             )
 
+            // PERBAIKAN: Simpan ke history_dispen user tersebut
             db.collection("users").document(uid)
                 .collection("history_dispen")
                 .add(historyData)
-                .addOnSuccessListener {
-                    db.collection("users").document(uid)
-                        .update("totalDispen", FieldValue.increment(1))
+                 .addOnSuccessListener {
+                     // PERBAIKAN: Tambahkan try-catch agar jika ada error kecil, aplikasi tidak langsung force close/mental
+                     try {
+                         db.collection("users").document(uid)
+                             .update("totalDispen", FieldValue.increment(1))
 
-                    if (!isGuru && muridKelasId.isNotBlank()) {
-                        ForumKelasActivity.kirimPesanSistem(
-                            db, muridKelasId,
-                            "📋 $nama mengajukan DISPENSASI pada $tanggal. Alasan: $alasan"
-                        )
-                    }
+                         if (!isGuru && muridKelasId.isNotBlank()) {
+                             try {
+                                 ForumKelasActivity.kirimPesanSistem(
+                                     db, muridKelasId,
+                                     "📋 $nama mengajukan DISPENSASI pada $tanggal. Alasan: $alasan"
+                                 )
+                             } catch (e: Exception) {
+                                 // Abaikan jika error di pesan sistem, agar tetap bisa lanjut ke Struk
+                                 e.printStackTrace()
+                             }
+                         }
 
-                    btnSubmit.isEnabled = true
+                         btnSubmit.isEnabled = true
 
-                    startActivity(Intent(this, StrukDispensasi::class.java).apply {
-                        putExtra("NAMA", nama)
-                        putExtra("KELAS", kelas)
-                        putExtra("ALASAN", alasan)
-                        putExtra("WALI_KELAS", wali)
-                    })
+                         // Gunakan this@DispensasiActivity untuk memastikan contextnya benar
+                         val intent = Intent(this@DispensasiActivity, StrukDispensasi::class.java).apply {
+                             putExtra("NAMA", nama ?: "")
+                             putExtra("KELAS", kelas ?: "")
+                             putExtra("ALASAN", alasan ?: "")
+                             putExtra("WALI_KELAS", wali ?: "")
+                         }
+                         startActivity(intent)
+                         finish()
 
-                    finish()
-                }
+                     } catch (e: Exception) {
+                         btnSubmit.isEnabled = true
+                         Toast.makeText(this@DispensasiActivity, "Terjadi kesalahan saat memuat struk", Toast.LENGTH_SHORT).show()
+                         e.printStackTrace()
+                     }
+                 }
                 .addOnFailureListener {
                     btnSubmit.isEnabled = true
                     Toast.makeText(this, "Gagal: ${it.message}", Toast.LENGTH_SHORT).show()

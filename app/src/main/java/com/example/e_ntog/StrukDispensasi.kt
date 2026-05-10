@@ -41,11 +41,11 @@ class StrukDispensasi : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_struk_dispensasi)
 setupBackButton()
-        // Ambil data dari Intent
-        val nama = intent.getStringExtra("NAMA") ?: "Tidak Ada Data"
-        val kelas = intent.getStringExtra("KELAS") ?: "Tidak Ada Data"
-        val alasan = intent.getStringExtra("ALASAN") ?: "Tidak Ada Data"
-        val waliKelas = intent.getStringExtra("WALI_KELAS") ?: "Tidak Ada Data"
+        // Ambil data dari Intent dengan pengecekan null
+        val nama = intent.getStringExtra("NAMA") ?: ""
+        val kelas = intent.getStringExtra("KELAS") ?: ""
+        val alasan = intent.getStringExtra("ALASAN") ?: ""
+        val waliKelas = intent.getStringExtra("WALI_KELAS") ?: ""
 
         // Temukan komponen
         cardStruk = findViewById(R.id.card_struk)
@@ -59,11 +59,11 @@ setupBackButton()
         val btnDownload    = findViewById<View>(R.id.btn_download)
         val backButton     = findViewById<ImageView>(R.id.iv_back_arrow)
 
-        // Set text
-        tvNama.text = "Nama : $nama"
-        tvKelas.text = "Kelas : $kelas"
-        tvAlasan.text = "Alasan Dispensasi : $alasan"
-        tvWali.text = "Wali Kelas : $waliKelas"
+        // Set text dengan pengecekan nilai kosong
+        tvNama.text = if (nama.isNotEmpty()) "Nama : $nama" else "Nama : Tidak Ada Data"
+        tvKelas.text = if (kelas.isNotEmpty()) "Kelas : $kelas" else "Kelas : Tidak Ada Data"
+        tvAlasan.text = if (alasan.isNotEmpty()) "Alasan Dispensasi : $alasan" else "Alasan Dispensasi : Tidak Ada Data"
+        tvWali.text = if (waliKelas.isNotEmpty()) "Wali Kelas : $waliKelas" else "Wali Kelas : Tidak Ada Data"
 
         // Tombol back
         backButton.setOnClickListener {

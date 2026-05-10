@@ -51,6 +51,9 @@ class TerlambatActivity : BaseActivity() {
                 if (result.resultCode == Activity.RESULT_OK) {
                     val namaWali = result.data?.getStringExtra("NAMA_WALI_TERPILIH")
                     etWaliKelas.setText(namaWali)
+                    clSearchWali.setBackgroundResource(R.drawable.bg_edittext_green)
+                    etWaliKelas.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_check_circle, 0)
+                    etWaliKelas.setPadding(16, 0, 16, 0)
                 }
             }
 
@@ -76,6 +79,13 @@ class TerlambatActivity : BaseActivity() {
 
             btnSubmit.isEnabled = false
 
+            // VALIDASI KRUSIAL: Cek apakah data kelas sudah siap
+            if (!isGuru && muridKelasId.isEmpty()) {
+                Toast.makeText(this, "Data kelas sedang dimuat, tunggu sebentar...", Toast.LENGTH_SHORT).show()
+                btnSubmit.isEnabled = true
+                return@setOnClickListener
+            }
+
             val data = hashMapOf(
                 "nama" to nama,
                 "kelas" to kelas,
@@ -85,9 +95,11 @@ class TerlambatActivity : BaseActivity() {
                 "timestamp" to FieldValue.serverTimestamp()
             )
 
-            db.collection("laporan_terlambat").add(data).addOnSuccessListener {
+            // PERBAIKAN: Ambil UID dari session, lalu simpan ke history_terlambat user tersebut
+            val uid = session.getUid()
+            db.collection("users").document(uid).collection("history_terlambat").add(data).addOnSuccessListener {
                 // Pindah ke Struk
-                val intent = Intent(this, StrukActivity::class.java)
+                val intent = Intent(this, StrukTerlambat::class.java)
                 intent.putExtra("NAMA", nama)
                 intent.putExtra("KELAS", kelas)
                 intent.putExtra("ALASAN", alasan)

@@ -92,6 +92,12 @@ class TidakHadirActivity : BaseActivity() {
                 kelas = "Guru"
                 wali  = "-"
             } else {
+                // VALIDASI KRUSIAL: Cek apakah data kelas sudah siap
+                if (muridKelasId.isEmpty()) {
+                    Toast.makeText(this, "Data kelas sedang dimuat, tunggu sebentar...", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                
                 kelas = spinnerKelas.selectedItem?.toString() ?: ""
                 wali  = etWaliKelas.text.toString().trim()
                 if (kelas.isEmpty() || kelas == "Belum join kelas") {
@@ -122,24 +128,40 @@ class TidakHadirActivity : BaseActivity() {
                 .collection("history_tidak_hadir")
                 .add(historyData)
                 .addOnSuccessListener {
-                    db.collection("users").document(uid)
-                        .update("totalTidakHadir", FieldValue.increment(1))
+                    // PERBAIKAN: Tambahkan try-catch agar jika ada error kecil, aplikasi tidak langsung force close/mental
+                    try {
+                        db.collection("users").document(uid)
+                            .update("totalTidakHadir", FieldValue.increment(1))
 
-                    if (!isGuru && muridKelasId.isNotEmpty()) {
-                        ForumKelasActivity.kirimPesanSistem(
-                            db, muridKelasId,
-                            "📋 $nama mengajukan izin TIDAK HADIR pada $tanggal. Alasan: $alasan"
-                        )
+                        if (!isGuru && muridKelasId.isNotEmpty()) {
+                            try {
+                                ForumKelasActivity.kirimPesanSistem(
+                                    db, muridKelasId,
+                                    "📋 $nama mengajukan izin TIDAK HADIR pada $tanggal. Alasan: $alasan"
+                                )
+                            } catch (e: Exception) {
+                                // Abaikan jika error di pesan sistem, agar tetap bisa lanjut ke Struk
+                                e.printStackTrace()
+                            }
+                        }
+
+                        btnSubmit.isEnabled = true
+
+                        // Gunakan this@TidakHadirActivity untuk memastikan contextnya benar
+                        val intent = Intent(this@TidakHadirActivity, StrukTidakHadir::class.java).apply {
+                            putExtra("NAMA", nama ?: "")
+                            putExtra("KELAS", kelas ?: "")
+                            putExtra("ALASAN", alasan ?: "")
+                            putExtra("WALI_KELAS", wali ?: "")
+                        }
+                        startActivity(intent)
+                        finish()
+
+                    } catch (e: Exception) {
+                        btnSubmit.isEnabled = true
+                        Toast.makeText(this@TidakHadirActivity, "Terjadi kesalahan saat memuat struk", Toast.LENGTH_SHORT).show()
+                        e.printStackTrace()
                     }
-
-                    btnSubmit.isEnabled = true
-                    startActivity(Intent(this, StrukTidakHadir::class.java).apply {
-                        putExtra("NAMA", nama)
-                        putExtra("KELAS", kelas)
-                        putExtra("ALASAN", alasan)
-                        putExtra("WALI_KELAS", wali)
-                    })
-                    finish()
                 }
                 .addOnFailureListener {
                     btnSubmit.isEnabled = true

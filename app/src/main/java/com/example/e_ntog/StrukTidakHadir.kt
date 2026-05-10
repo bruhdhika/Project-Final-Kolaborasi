@@ -40,11 +40,11 @@ class StrukTidakHadir : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_struk_tidak_hadir)
 setupBackButton()
-        // Ambil data
-        val nama = intent.getStringExtra("NAMA") ?: "Tidak Ada Data"
-        val kelas = intent.getStringExtra("KELAS") ?: "Tidak Ada Data"
-        val alasan = intent.getStringExtra("ALASAN") ?: "Tidak Ada Data"
-        val waliKelas = intent.getStringExtra("WALI_KELAS") ?: "Tidak Ada Data"
+        // Ambil data dengan pengecekan null
+        val nama = intent.getStringExtra("NAMA") ?: ""
+        val kelas = intent.getStringExtra("KELAS") ?: ""
+        val alasan = intent.getStringExtra("ALASAN") ?: ""
+        val waliKelas = intent.getStringExtra("WALI_KELAS") ?: ""
 
         // Temukan komponen
         cardStruk = findViewById(R.id.card_struk)
@@ -52,15 +52,15 @@ setupBackButton()
         val tvKelas = findViewById<TextView>(R.id.tv_struk_kelas)
         val tvAlasan = findViewById<TextView>(R.id.tv_struk_alasan)
         val tvWali = findViewById<TextView>(R.id.tv_struk_wali)
-        val btnKembaliHome = findViewById<AppCompatButton>(R.id.btn_kembali_home)
+        val btnKembaliHome = findViewById<TextView>(R.id.btn_kembali_home)
         val btnDownload = findViewById<Button>(R.id.btn_download)
         val backButton = findViewById<ImageView>(R.id.iv_back_arrow)
 
-        // Set text
-        tvNama.text = "Nama : $nama"
-        tvKelas.text = "Kelas : $kelas"
-        tvAlasan.text = "Alasan Tidak Masuk : $alasan"
-        tvWali.text = "Wali Kelas : $waliKelas"
+        // Set text dengan pengecekan nilai kosong
+        tvNama.text = if (nama.isNotEmpty()) "Nama : $nama" else "Nama : Tidak Ada Data"
+        tvKelas.text = if (kelas.isNotEmpty()) "Kelas : $kelas" else "Kelas : Tidak Ada Data"
+        tvAlasan.text = if (alasan.isNotEmpty()) "Alasan Tidak Masuk : $alasan" else "Alasan Tidak Masuk : Tidak Ada Data"
+        tvWali.text = if (waliKelas.isNotEmpty()) "Wali Kelas : $waliKelas" else "Wali Kelas : Tidak Ada Data"
 
         // Tombol back
         backButton.setOnClickListener {
